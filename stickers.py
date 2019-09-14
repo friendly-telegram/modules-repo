@@ -163,11 +163,15 @@ class StickersMod(loader.Module):
                         async with conv:
                             first = await conv.send_message("/cancel")
                             await conv.send_message("/addsticker")
-                            buttons = (await conv.get_response()).buttons
+                            r0 = await conv.get_response()
+                            buttons = r0.buttons
                             if buttons is not None:
                                 logger.debug("there are buttons, good")
                                 button = click_buttons(buttons, args[0])
                                 await button.click()
+                            elif "/newpack" in r0.message:
+                                await message.edit("<code>Please create a pack first</code>")
+                                return
                             else:
                                 logger.warning("there's no buttons!")
                                 await message.client.send_message("t.me/" + self.config["STICKERS_USERNAME"], "/cancel")
@@ -191,12 +195,17 @@ class StickersMod(loader.Module):
                                                                      msgs + [first])
                                 return
                             m1 = await conv.send_file(thumb, force_document=True)
-                            m2 = await conv.send_message(emojis)
-                            await conv.send_message("/done")
-                            # Block now so that we mark it all as read
-                            await message.client.send_read_acknowledge(conv.chat_id)
                             r1 = await conv.get_response(m1)
+                            m2 = await conv.send_message(emojis)
                             r2 = await conv.get_response(m2)
+                            if "/done" in r2.message:
+                                await conv.send_message("/done")
+                            else:
+                                logger.error(r1)
+                                logger.error(r2)
+                                logger.error("Bad response from StickerBot 0")
+                                await message.edit(_("<code>Something went wrong internally</code>"))
+                            await message.client.send_read_acknowledge(conv.chat_id)
                             if "/done" not in r2.message:
                                 # That's an error
                                 logger.error("Bad response from StickerBot 1")
