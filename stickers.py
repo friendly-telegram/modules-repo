@@ -22,12 +22,16 @@ import logging
 import warnings
 import itertools
 import asyncio
-import tgs
 
 from io import BytesIO
 from PIL import Image
 
 logger = logging.getLogger(__name__)
+
+try:
+    import tgs
+except OSError:
+    logger.exception()
 
 warnings.simplefilter('error', Image.DecompressionBombWarning)
 
