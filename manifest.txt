@@ -1,1 +1,26 @@
-nothing here
+afk
+autoprofile
+b_emoji
+forward
+info
+insult
+lydia
+lyrics
+misc
+mock
+nopm
+purge
+quicktype
+recentactions
+spam
+speedtest
+stickers
+terminal
+transfersh
+translate
+tts
+typer
+userinfo
+weather
+xda
+yesno
