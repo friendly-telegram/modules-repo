@@ -37,7 +37,7 @@ class BEmojiMod(loader.Module):
             text = (await message.get_reply_message()).message
         else:
             text = utils.get_args_raw(message.message)
-        if text is None:
+        if text is None or len(text) == 0:
             await message.edit(_("<code>There's nothing to 🅱️-ify</code>"))
             return
         text = list(text)
