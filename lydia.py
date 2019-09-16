@@ -65,10 +65,12 @@ class LydiaMod(loader.Module):
                 session = self._lydia.get_session(session["id"])
                 if session["available"]:
                     nsessions.update({ident: session})
-        if len(nsessions):
+        if len(nsessions) > 1:
             next = min(*[v["expires"] for k, v in nsessions.items()])
+        elif len(nsessions) == 1:
+            [next] = [v["expires"] for k, v in nsessions.items()]
         else:
-            next = 86399
+            next = t + 86399
         if nsessions != sessions:
             self._db.set(__name__, "sessions", nsessions)
         # Don't worry about the 1 day limit below 3.7.1, if it isn't expired we will just reschedule,
