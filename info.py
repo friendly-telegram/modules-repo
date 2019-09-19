@@ -22,6 +22,7 @@ import logging
 import platform
 import asyncio
 import shutil
+import telethon
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +72,7 @@ class InfoMod(loader.Module):
             if not done:
                 reply += "\n" + _("Could not determine Linux distribution")
         reply += "\n" + _("Python version: {}").format(utils.escape_html(platform.python_version()))
+        reply += "\n" + _("Telethon Version: {}").format(utils.escape_html(telethon.__version__))
         reply += '</code>'
         logger.debug(reply)
         await message.edit(reply)
