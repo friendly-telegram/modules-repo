@@ -203,7 +203,7 @@ class StickersMod(loader.Module):
                                 await message.client.delete_messages("t.me/" + self.config["STICKERS_USERNAME"],
                                                                      msgs + [first])
                                 return
-                            m1 = await conv.send_file(thumb, force_document=True)
+                            m1 = await conv.send_file(thumb, allow_cache=False, force_document=True)
                             r1 = await conv.get_response(m1)
                             m2 = await conv.send_message(emojis)
                             r2 = await conv.get_response(m2)
