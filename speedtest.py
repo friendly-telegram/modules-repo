@@ -42,15 +42,18 @@ class YourMod(loader.Module):
             try:
                 servers += [int(server)]
             except ValueError:
-                logger.debug("server failed")
-        speedtester = speedtest.Speedtest()
-        speedtester.get_servers(servers)
-        speedtester.get_best_server()
-        speedtester.download(threads=None)
-        speedtester.upload(threads=None)
-        results = speedtester.results.dict()
+                logger.warning("server failed")
+        results = await utils.run_sync(self.speedtest, servers)
         ret = _("<b>Speedtest Results:</b>") + "\n\n"
         ret += _("<b>Download:</b> <code>{} MiB/s</code>").format(round(results["download"] / 2**20, 2)) + "\n"
         ret += _("<b>Upload:</b> <code>{} MiB/s</code>").format(round(results["upload"] / 2**20, 2)) + "\n"
         ret += _("<b>Ping:</b> <code>{} seconds</code>").format(round(results["ping"], 2)) + "\n"
         await utils.answer(message, ret)
+
+    def speedtest(self, servers):
+        speedtester = speedtest.Speedtest()
+        speedtester.get_servers(servers)
+        speedtester.get_best_server()
+        speedtester.download(threads=None)
+        speedtester.upload(threads=None)
+        return speedtester.results.dict()
