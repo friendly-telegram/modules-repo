@@ -151,11 +151,17 @@ class StickersMod(loader.Module):
 
             else:
                 try:
-                    thumb = BytesIO()
-                    await utils.run_sync(resize_image, img, self.config["STICKER_SIZE"], thumb)
-                    img.close()
-                    thumb.name = "sticker.png"
-                    thumb.seek(0)
+                    if sticker.sticker:
+                        # It is already a sticker, don't bother processing it as we know it's the right size
+                        thumb = img
+                        del img
+                    else:
+                        # Resize into a new buffer
+                        thumb = BytesIO()
+                        await utils.run_sync(resize_image, img, self.config["STICKER_SIZE"], thumb)
+                        img.close()
+                        thumb.name = "sticker.png"
+                        thumb.seek(0)
                     # The data is now in thumb.
                     # Lock access to @Stickers
                     async with self._lock:
