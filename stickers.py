@@ -158,7 +158,7 @@ class StickersMod(loader.Module):
                         # Resize into a new buffer
                         thumb = BytesIO()
                         await utils.run_sync(resize_image, img, self.config["STICKER_SIZE"], thumb)
-                    img.close()
+                        img.close()
                     thumb.name = "sticker.png"
                     thumb.seek(0)
                     # The data is now in thumb.
