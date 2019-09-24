@@ -159,6 +159,7 @@ class StickersMod(loader.Module):
                         thumb = BytesIO()
                         await utils.run_sync(resize_image, img, self.config["STICKER_SIZE"], thumb)
                     img.close()
+                    img = None  # set it to null like in C lol
                     thumb.name = "sticker.png"
                     thumb.seek(0)
                     # The data is now in thumb.
@@ -239,7 +240,8 @@ class StickersMod(loader.Module):
                 finally:
                     thumb.close()
         finally:
-            img.close()
+            if img is not None:
+                img.close()
         packurl = utils.escape_quotes(f"https://t.me/addstickers/{button.text}")
         await message.edit(_('<code>Sticker added to</code> <a href="{}">pack</a><code>!</code>').format(packurl))
 
