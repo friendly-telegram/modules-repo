@@ -36,6 +36,9 @@ class RecentActionsMod(loader.Module):
         if not message.is_reply:
             await utils.answer(message, _("<code>Reply to a message to specify where to start</code>"))
             return
+        if not isinstance(message.to_id, telethon.tl.types.PeerChannel):
+            await utils.answer(message, _("<code>This isn't a supergroup or channel"))
+            return
         target = (await message.get_reply_message()).date
         ret = []
         try:
