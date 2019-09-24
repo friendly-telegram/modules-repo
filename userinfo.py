@@ -18,10 +18,8 @@
 
 from .. import loader, utils
 import logging
-import asyncio
 
 from telethon.tl.functions.users import GetFullUserRequest
-from telethon.tl.types import Channel, Chat
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +50,6 @@ class UserInfoMod(loader.Module):
 
     async def permalinkcmd(self, message):
         """Get permalink to user based on ID or username"""
-        # Recent server changes make this almost useless. Remove to cleanup code? TODO consider this
         args = utils.get_args(message)
         if len(args) < 1:
             await message.edit(_("Provide a user to locate"))
@@ -67,51 +64,12 @@ class UserInfoMod(loader.Module):
             logger.debug(e)
             # look for the user
             await message.edit(_("Searching for user..."))
-            dialogs = await self.client.get_dialogs()
+            await self.client.get_dialogs()
             try:
                 user = await self.client.get_input_entity(user)
             except ValueError:
-                logger.debug(e)
-                # look harder for the user
-                basemsg = _("Searching harder for user... May take several minutes, or even hours. "
-                            + "Current progress: {}/{}")
-                await message.edit(basemsg.format(0, len(dialogs)))
-                # Look in every group the user is in, in batches. After each batch,
-                # attempt to get the input entity again
-                ops = []
-                c = 0
-                fulluser = None
-                for dialog in dialogs:
-                    if len(ops) >= 50:
-                        logger.debug(str(c) + "/" + str(len(dialogs)))
-                        c += 1
-                        await asyncio.gather(*ops, message.edit(basemsg.format(c, len(dialogs))),
-                                             return_exceptions=True)
-                        ops = []
-                        try:
-                            fulluser = await self.client.get_input_entity(user)
-                        except ValueError as e:
-                            logger.debug(e)
-                    # Channels usually fail because we can't list members.
-                    if isinstance(dialog.entity, Chat) or isinstance(dialog.entity, Channel):
-                        logger.debug(dialog)
-                        ops += [self.client.get_participants(dialog.entity, aggressive=True)]
-
-                # Check once more, in case the entity is in the last 50 peers
-                if len(ops):
-                    await asyncio.gather(*ops, return_exceptions=True)
-                    ops = []
-                if fulluser is None:
-                    try:
-                        fulluser = await self.client.get_input_entity(user)
-                    except ValueError as e:
-                        logger.error(e)
-
-                if fulluser is None:
-                    await message.edit(_("Unable to get permalink!"))
-                    return
-                else:
-                    user = fulluser
+                await message.edit(_("Can't find user."))
+                return
         if len(args) > 1:
             await utils.answer(message, "<a href='tg://user?id={uid}'>{txt}</a>".format(uid=user.user_id, txt=args[1]))
         else:
