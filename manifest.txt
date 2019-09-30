@@ -1,3 +1,4 @@
+admin_tools
 afk
 autoprofile
 b_emoji
