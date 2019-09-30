@@ -22,7 +22,6 @@ import logging
 from telethon.tl.types import ChatBannedRights, PeerUser, PeerChannel
 from telethon.errors import BadRequestError
 from telethon.tl.functions.channels import EditBannedRequest
-from telethon.tl.functions.messages import DeleteChatUserRequest
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +38,8 @@ class BanMod(loader.Module):
     async def bancmd(self, message):
         """Ban the user from the group"""
         if not isinstance(message.to_id, PeerChannel):
-            return await utils.answer(message, _("You can't ban someone unless they're in a supergroup! Try blocking them."))
+            return await utils.answer(message,
+                                      _("You can't ban someone unless they're in a supergroup! Try blocking them."))
         if message.is_reply:
             user = await utils.get_user(await message.get_reply_message())
         else:
@@ -52,7 +52,7 @@ class BanMod(loader.Module):
         logger.debug(user)
         try:
             await self.client(EditBannedRequest(message.chat_id, user.id,
-                                                    ChatBannedRights(until_date=None, view_messages=True)))
+                                                ChatBannedRights(until_date=None, view_messages=True)))
         except BadRequestError:
             await message.edit(_("Am I an admin here?"))
         else:
@@ -85,7 +85,8 @@ class BanMod(loader.Module):
     async def kickcmd(self, message):
         """Kick the user out of the group"""
         if isinstance(message.to_id, PeerUser):
-            return await utils.answer(message, _("You can't kick someone unless they're in a group! Try blocking them."))
+            return await utils.answer(message,
+                                      _("You can't kick someone unless they're in a group! Try blocking them."))
         if message.is_reply:
             user = await utils.get_user(await message.get_reply_message())
         else:
