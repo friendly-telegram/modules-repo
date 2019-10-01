@@ -165,7 +165,7 @@ class MessageEditor():
         text += utils.escape_html(self.stderr[max(len(self.stdout) - 1024, 0):]) + "</code>"
         try:
             await self.message.edit(text)
-        except telethon.errors.rpcerrorlist.MessageNotModifiedError as e:
+        except telethon.errors.rpcerrorlist.MessageNotModifiedError:
             pass
         except telethon.errors.rpcerrorlist.MessageTooLongError as e:
             logger.error(e)
@@ -269,7 +269,7 @@ class SudoMessageEditor(MessageEditor):
             # The user has provided interactive authentication. Send password to stdin for sudo.
             try:
                 self.authmsg = await message.edit(_("Authenticating..."))
-            except telethon.errors.rpcerrorlist.MessageNotModifiedError as e:
+            except telethon.errors.rpcerrorlist.MessageNotModifiedError:
                 # Try to clear personal info if the edit fails
                 await message.delete()
             self.state = 1
@@ -294,9 +294,9 @@ class RawMessageEditor(SudoMessageEditor):
         logger.debug(text)
         try:
             await self.message.edit(text)
-        except telethon.errors.rpcerrorlist.MessageNotModifiedError as e:
+        except telethon.errors.rpcerrorlist.MessageNotModifiedError:
             pass
-        except telethon.errors.rpcerrorlist.MessageEmptyError as e:
+        except telethon.errors.rpcerrorlist.MessageEmptyError:
             pass
         except telethon.errors.rpcerrorlist.MessageTooLongError as e:
             logger.error(e)
