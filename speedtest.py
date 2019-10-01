@@ -47,7 +47,7 @@ class YourMod(loader.Module):
         ret = _("<b>Speedtest Results:</b>") + "\n\n"
         ret += _("<b>Download:</b> <code>{} MiB/s</code>").format(round(results["download"] / 2**20, 2)) + "\n"
         ret += _("<b>Upload:</b> <code>{} MiB/s</code>").format(round(results["upload"] / 2**20, 2)) + "\n"
-        ret += _("<b>Ping:</b> <code>{} seconds</code>").format(round(results["ping"], 2)) + "\n"
+        ret += _("<b>Ping:</b> <code>{} milliseconds</code>").format(round(results["ping"], 2)) + "\n"
         await utils.answer(message, ret)
 
     def speedtest(self, servers):
