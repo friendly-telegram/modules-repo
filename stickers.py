@@ -49,7 +49,7 @@ class StickersMod(loader.Module):
         self.name = _("Stickers")
         self._lock = asyncio.Lock()
 
-    async def kangcmd(self, message):
+    async def kangcmd(self, message):  # noqa: C901 # TODO: reduce complexity a LOT
         """Use in reply or with an attached media:
            .kang <pack name> [emojis]
            If pack is not matched the most recently created will be used instead"""
