@@ -14,8 +14,6 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# flake8: noqa: E203
-
 from .. import loader
 import random
 
@@ -24,30 +22,21 @@ def register(cb):
     cb(XDAMod())
 
 
-# TODO translate
-RANDOM_WORDS = ["sur", "Sir", "bro", "yes", "no", "bolte", "bolit", "bholit", "volit", "mustah", "fap", "lit", "lmao"]
-WEIGHT_WORDS = [6    , 6,     6    , 5    , 5   , 2      , 2      , 3       , 3      , 4       , 5    , 3    , 6     ]
-
-RANDOM_WORDS += ["iz", "jiosim", "ijo", "nut", "workz", "workang", "flashabl zip", "bateri", "bacup", "bad englis"]
-WEIGHT_WORDS += [7   , 8       , 4    , 7    , 4      , 4        , 6             , 6       , 6      , 5           ]
-
-RANDOM_WORDS += ["sar", "treble wen", "gsi", "fox bag", "bag fox", "fine", "bast room", "fax", "trable", "kenzo"]
-WEIGHT_WORDS += [5    ,  2          , 6    , 3        , 3        , 4     , 5          , 3    , 3       , 4      ]
-
-RANDOM_WORDS += ["plz make room", "andreid pai", "when", "port", "mtk", "send moni", "bad rom", "dot", "rr", "linage"]
-WEIGHT_WORDS += [3              , 2            , 4     , 5     , 3    , 3          , 2        , 4    , 4   , 4       ]
-
-RANDOM_WORDS += ["arrows", "kernal"]
-WEIGHT_WORDS += [4       , 4       ]
+RANDOM_WORDS = {'sur': 6, 'Sir': 6, 'bro': 6, 'yes': 5, 'no': 5, 'bolte': 2, 'bolit': 2, 'bholit': 3, 'volit': 3,
+                'mustah': 4, 'fap': 5, 'lit': 3, 'lmao': 6, 'iz': 7, 'jiosim': 8, 'ijo': 4, 'nut': 7, 'workz': 4,
+                'workang': 4, 'flashabl zip': 6, 'bateri': 6, 'bacup': 6, 'bad englis': 5, 'sar': 5, 'treble wen': 2,
+                'gsi': 6, 'fox bag': 3, 'bag fox': 3, 'fine': 4, 'bast room': 5, 'fax': 3, 'trable': 3, 'kenzo': 4,
+                'plz make room': 3, 'andreid pai': 2, 'when': 4, 'port': 5, 'mtk': 3, 'send moni': 3, 'bad rom': 2,
+                'dot': 4, 'rr': 4, 'linage': 4, 'arrows': 4, 'kernal': 4}
 
 # Workaround for 3.5
-WORDS_WEIGHTED = [RANDOM_WORDS[i] for i in range(len(RANDOM_WORDS)) for dummy in range(WEIGHT_WORDS[i])]
+WORDS_WEIGHTED = [word for word, count in RANDOM_WORDS.items() for i in range(count)]
+
 
 class XDAMod(loader.Module):
     """Gibes bholte bro"""
     def __init__(self):
-        self.config = loader.ModuleConfig("XDA_RANDOM_WORDS", RANDOM_WORDS, "Random words from XDA",
-                                          "XDA_WEIGHT_WORDS", WEIGHT_WORDS, "And the weightings")
+        self.config = loader.ModuleConfig("XDA_RANDOM_WORDS", RANDOM_WORDS, "Random words from XDA as dict & weight")
         self.name = "XDA"
 
     async def xdacmd(self, message):
@@ -57,8 +46,7 @@ class XDAMod(loader.Module):
         string = [random.choice(WORDS_WEIGHTED) for dummy in range(length)]
 
         # Unsupported in python 3.5
-        #string = random.choices(self.config["XDA_RANDOM_WORDS"], weights=self.config["XDA_WEIGHT_WORDS"], k=length)
+        # string = random.choices(self.config["XDA_RANDOM_WORDS"], weights=self.config["XDA_WEIGHT_WORDS"], k=length)
 
         random.shuffle(string)
         await message.edit(" ".join(string))
-
