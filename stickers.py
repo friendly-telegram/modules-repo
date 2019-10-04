@@ -172,13 +172,14 @@ class StickersMod(loader.Module):
                             if buttons is not None:
                                 logger.debug("there are buttons, good")
                                 button = click_buttons(buttons, args[0])
-                                await button.click()
+                                m0 = await button.click()
                             elif "/newpack" in r0.message:
                                 await message.edit("<code>Please create a pack first</code>")
                                 return
                             else:
                                 logger.warning("there's no buttons!")
-                                await message.client.send_message("t.me/" + self.config["STICKERS_USERNAME"], "/cancel")
+                                m0 = await message.client.send_message("t.me/" + self.config["STICKERS_USERNAME"],
+                                                                       "/cancel")
                                 await message.edit("<code>Something went wrong</code>")
                                 return
                             # We have sent the pack we wish to modify.
@@ -194,6 +195,22 @@ class StickersMod(loader.Module):
                                                                               min_id=first.id,
                                                                               reverse=True):
                                     msgs += [msg.id]
+                                logger.debug(msgs)
+                                await message.client.delete_messages("t.me/" + self.config["STICKERS_USERNAME"],
+                                                                     msgs + [first])
+                                return
+                            if "120" in r0.message:
+                                logger.error("bad response from stickerbot 0")
+                                logger.error(r0)
+                                await message.edit(_("<code>That pack is full. Delete some stickers or try making a "
+                                                     "new pack.</code>"))
+                                msgs = []
+                                async for msg in message.client.iter_messages(entity="t.me/"
+                                                                              + self.config["STICKERS_USERNAME"],
+                                                                              min_id=first.id,
+                                                                              reverse=True):
+                                    if msg.id != m0.id:
+                                        msgs += [msg.id]
                                 logger.debug(msgs)
                                 await message.client.delete_messages("t.me/" + self.config["STICKERS_USERNAME"],
                                                                      msgs + [first])
