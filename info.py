@@ -16,13 +16,15 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from .. import loader, utils
-
 import logging
 import platform
 import asyncio
 import shutil
+import sys
+
 import telethon
+
+from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +73,7 @@ class InfoMod(loader.Module):
                         done = True
             if not done:
                 reply += "\n" + _("Could not determine Linux distribution")
-        reply += "\n" + _("Python version: {}").format(utils.escape_html(platform.python_version()))
+        reply += "\n" + _("Python version: {}").format(utils.escape_html(sys.version))
         reply += "\n" + _("Telethon Version: {}").format(utils.escape_html(telethon.__version__))
         reply += '</code>'
         logger.debug(reply)
