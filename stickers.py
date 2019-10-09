@@ -92,6 +92,7 @@ class StickersMod(loader.Module):
                                                        timeout=5, exclusive=True)
                     async with conv:
                         first = await conv.send_message("/cancel")
+                        await conv.get_response()
                         await conv.send_message("/addsticker")
                         buttons = (await conv.get_response()).buttons
                         if buttons is not None:
@@ -166,6 +167,7 @@ class StickersMod(loader.Module):
                                                            timeout=5, exclusive=True)
                         async with conv:
                             first = await conv.send_message("/cancel")
+                            await conv.get_response()
                             await conv.send_message("/addsticker")
                             r0 = await conv.get_response()
                             buttons = r0.buttons
