@@ -62,7 +62,7 @@ class AutoProfileMod(loader.Module):
         if not pil_installed:
             return await utils.answer(message, _("<b>You don't have PIL (Pillow) installed.</b>"))
 
-        if not await self.client.get_profile_photos(await self.client.get_me(), limit=1):
+        if not await self.client.get_profile_photos('me', limit=1):
             return await utils.answer(message, _("<b>You don't have a profile pic set.</b>"))
 
         msg = utils.get_args(message)
@@ -71,14 +71,12 @@ class AutoProfileMod(loader.Module):
 
         try:
             timeout_autopfp = int(msg[0])
-        except ValueError as e:
-            logger.warning(str(e))
+        except ValueError:
             return await utils.answer(message, _("<b>Wrong time.</b>"))
 
         try:
             degrees = int(msg[1])
-        except ValueError as e:
-            logger.warning(str(e))
+        except ValueError:
             return await utils.answer(message, _("<b>Wrong degrees value.</b>"))
 
         try:
@@ -95,7 +93,7 @@ class AutoProfileMod(loader.Module):
         await utils.answer(message, "<b>Successfully enabled autopfp.</b>")
 
         while self.pfp_enabled:
-            self.pfp_degree += degrees
+            self.pfp_degree += degrees % 360
             rotated = raw_pfp.rotate(self.pfp_degree)
             buf = BytesIO()
             rotated.save(buf, format='JPEG')
@@ -103,7 +101,7 @@ class AutoProfileMod(loader.Module):
 
             if self.pfp_remove_latest:
                 await self.client(functions.photos.DeletePhotosRequest(
-                    await self.client.get_profile_photos(await self.client.get_me(), limit=1)
+                    await self.client.get_profile_photos('me', limit=1)
                 ))
 
             await self.client(functions.photos.UploadProfilePhotoRequest(
@@ -120,7 +118,7 @@ class AutoProfileMod(loader.Module):
             self.pfp_enabled = False
 
             await self.client(functions.photos.DeletePhotosRequest(
-                await self.client.get_profile_photos(await self.client.get_me(), limit=1)
+                await self.client.get_profile_photos('me', limit=1)
             ))
             await utils.answer(message, _("<b>Successfully disabled autobio, removing last profile pic.</b>"))
 
@@ -135,15 +133,14 @@ class AutoProfileMod(loader.Module):
             raw_bio = msg[1]
             try:
                 timeout_autobio = int(msg[0])
-            except ValueError as e:
-                logger.warning(str(e))
+            except ValueError:
                 return await utils.answer(message, _("<b>Wrong time.</b>"))
         if '{time}' not in raw_bio:
             return await utils.answer(message, _("<b>You haven't specified time position/Wrong format.</b>"))
 
         self.bio_enabled = True
         self.raw_bio = raw_bio
-        await utils.answer(message, "<b>Successfully enabled autobio.</b>")
+        await utils.answer(message, _("<b>Successfully enabled autobio.</b>"))
 
         while self.bio_enabled is True:
             current_time = time.strftime("%H:%M")
@@ -176,8 +173,7 @@ class AutoProfileMod(loader.Module):
             raw_name = msg[1]
             try:
                 timeout_autoname = int(msg[0])
-            except ValueError as e:
-                logger.error(str(e))
+            except ValueError:
                 return await utils.answer(message, _("<b>Wrong time.</b>"))
         if "{time}" not in raw_name:
             return await utils.answer(message, _("<b>You haven't specified time position/Wrong format.</b>"))
