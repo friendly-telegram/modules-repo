@@ -76,6 +76,7 @@ class TerminalMod(loader.Module):
         """Use in reply to send SIGTERM to a process"""
         if not message.is_reply:
             await message.edit(_("Reply to a terminal command to terminate it."))
+            return
         if hash_msg(await message.get_reply_message()) in self.activecmds:
             try:
                 self.activecmds[hash_msg(await message.get_reply_message())].terminate()
