@@ -17,13 +17,18 @@
 import asyncio
 import time
 import logging
-from PIL import Image
 from io import BytesIO
 from telethon.tl import functions
 from ast import literal_eval
 from .. import loader, utils
 
 logger = logging.getLogger(__name__)
+
+pil_installed = True
+try:
+    from PIL import Image
+except ImportError:
+    pil_installed = False
 
 
 def register(cb):
@@ -41,6 +46,7 @@ class AutoProfileMod(loader.Module):
         self.raw_bio = None
         self.raw_name = None
         self.pfp_degree = 0
+        self.pil_installed = pil_installed
 
     async def client_ready(self, client, db):
         self.client = client
@@ -52,6 +58,9 @@ class AutoProfileMod(loader.Module):
            Timeout - seconds
            Degrees - 60, -10, etc
            Remove last pfp - True/False, case sensitive"""
+
+        if not self.pil_installed:
+            return await utils.answer(message, _("<b>You don't have PIL (Pillow) installed.</b>"))
 
         if not await self.client.get_profile_photos(await self.client.get_me(), limit=1):
             return await utils.answer(message, _("<b>You don't have profile pic set.</b>"))
