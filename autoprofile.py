@@ -24,11 +24,12 @@ from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 
-pil_installed = True
 try:
     from PIL import Image
 except ImportError:
     pil_installed = False
+else:
+    pil_installed = True
 
 
 def register(cb):
@@ -46,7 +47,6 @@ class AutoProfileMod(loader.Module):
         self.raw_bio = None
         self.raw_name = None
         self.pfp_degree = 0
-        self.pil_installed = pil_installed
 
     async def client_ready(self, client, db):
         self.client = client
@@ -59,7 +59,7 @@ class AutoProfileMod(loader.Module):
            Degrees - 60, -10, etc
            Remove last pfp - True/False, case sensitive"""
 
-        if not self.pil_installed:
+        if not pil_installed:
             return await utils.answer(message, _("<b>You don't have PIL (Pillow) installed.</b>"))
 
         if not await self.client.get_profile_photos(await self.client.get_me(), limit=1):
@@ -86,9 +86,9 @@ class AutoProfileMod(loader.Module):
         except (ValueError, SyntaxError):
             return await utils.answer(message, _("<b>Please pass True or False for previous pfp removal.</b>"))
 
-        me = await self.client.get_me()
-        pfp = await self.client.download_profile_photo(me, file=bytes)
-        raw_pfp = Image.open(BytesIO(pfp))
+        pfp = BytesIO()
+        await self.client.download_profile_photo('me', file=pfp)
+        raw_pfp = Image.open(pfp)
 
         self.pfp_remove_latest = delete_previous
         self.pfp_enabled = True
@@ -118,8 +118,6 @@ class AutoProfileMod(loader.Module):
             return await utils.answer(message, _("<b>Autopfp is already disabled.</b>"))
         else:
             self.pfp_enabled = False
-            self.pfp_degree = 0
-            self.pfp_remove_latest = None
 
             await self.client(functions.photos.DeletePhotosRequest(
                 await self.client.get_profile_photos(await self.client.get_me(), limit=1)
