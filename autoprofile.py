@@ -63,7 +63,7 @@ class AutoProfileMod(loader.Module):
             return await utils.answer(message, _("<b>You don't have PIL (Pillow) installed.</b>"))
 
         if not await self.client.get_profile_photos(await self.client.get_me(), limit=1):
-            return await utils.answer(message, _("<b>You don't have profile pic set.</b>"))
+            return await utils.answer(message, _("<b>You don't have a profile pic set.</b>"))
 
         msg = utils.get_args(message)
         if len(msg) != 3:
@@ -84,7 +84,7 @@ class AutoProfileMod(loader.Module):
         try:
             delete_previous = literal_eval(msg[2])
         except (ValueError, SyntaxError):
-            return await utils.answer(message, _("<b>Please pass True or False for previous pfp removing.</b>"))
+            return await utils.answer(message, _("<b>Please pass True or False for previous pfp removal.</b>"))
 
         me = await self.client.get_me()
         pfp = await self.client.download_profile_photo(me, file=bytes)
