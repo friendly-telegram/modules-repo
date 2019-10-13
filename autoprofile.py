@@ -20,6 +20,7 @@ import logging
 from PIL import Image
 from io import BytesIO
 from telethon.tl import functions
+from ast import literal_eval
 from .. import loader, utils
 
 logger = logging.getLogger(__name__)
@@ -50,7 +51,10 @@ class AutoProfileMod(loader.Module):
 
            Timeout - seconds
            Degrees - 60, -10, etc
-           Remove last pfp - true or false, boolean, case insensitive"""
+           Remove last pfp - True/False, case sensitive"""
+
+        if not await self.client.get_profile_photos(await self.client.get_me(), limit=1):
+            return await utils.answer(message, _("<b>You don't have profile pic set.</b>"))
 
         msg = utils.get_args(message)
         if len(msg) != 3:
@@ -68,12 +72,10 @@ class AutoProfileMod(loader.Module):
             logger.warning(str(e))
             return await utils.answer(message, _("<b>Wrong degrees value.</b>"))
 
-        if msg[2].lower() == 'true':
-            delete_previous = True
-        elif msg[2].lower() == 'false':
-            delete_previous = False
-        else:
-            return await utils.answer(message, _("<b>Please pass true or false for previous pfp removing.</b>"))
+        try:
+            delete_previous = literal_eval(msg[2])
+        except (ValueError, SyntaxError):
+            return await utils.answer(message, _("<b>Please pass True or False for previous pfp removing.</b>"))
 
         me = await self.client.get_me()
         pfp = await self.client.download_profile_photo(me, file=bytes)
@@ -88,7 +90,7 @@ class AutoProfileMod(loader.Module):
             rotated = raw_pfp.rotate(self.pfp_degree)
             buf = BytesIO()
             rotated.save(buf, format='JPEG')
-            bytes_img = buf.getvalue()
+            buf.seek(0)
 
             if self.pfp_remove_latest:
                 await self.client(functions.photos.DeletePhotosRequest(
@@ -96,7 +98,7 @@ class AutoProfileMod(loader.Module):
                 ))
 
             await self.client(functions.photos.UploadProfilePhotoRequest(
-                await self.client.upload_file(bytes_img)
+                await self.client.upload_file(buf)
             ))
             await asyncio.sleep(timeout_autopfp)
 
