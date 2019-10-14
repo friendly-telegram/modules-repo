@@ -15,11 +15,11 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import asyncio
+import ast
 import time
 import logging
 from io import BytesIO
 from telethon.tl import functions
-from ast import literal_eval
 from .. import loader, utils
 
 logger = logging.getLogger(__name__)
@@ -46,7 +46,6 @@ class AutoProfileMod(loader.Module):
         self.pfp_remove_latest = None
         self.raw_bio = None
         self.raw_name = None
-        self.pfp_degree = 0
 
     async def client_ready(self, client, db):
         self.client = client
@@ -80,7 +79,7 @@ class AutoProfileMod(loader.Module):
             return await utils.answer(message, _("<b>Wrong degrees value.</b>"))
 
         try:
-            delete_previous = literal_eval(msg[2])
+            delete_previous = ast.literal_eval(msg[2])
         except (ValueError, SyntaxError):
             return await utils.answer(message, _("<b>Please pass True or False for previous pfp removal.</b>"))
 
@@ -90,11 +89,12 @@ class AutoProfileMod(loader.Module):
 
         self.pfp_remove_latest = delete_previous
         self.pfp_enabled = True
+        pfp_degree = 0
         await utils.answer(message, "<b>Successfully enabled autopfp.</b>")
 
         while self.pfp_enabled:
-            self.pfp_degree += degrees % 360
-            rotated = raw_pfp.rotate(self.pfp_degree)
+            pfp_degree = (pfp_degree + degrees) % 360
+            rotated = raw_pfp.rotate(pfp_degree)
             buf = BytesIO()
             rotated.save(buf, format='JPEG')
             buf.seek(0)
@@ -107,6 +107,7 @@ class AutoProfileMod(loader.Module):
             await self.client(functions.photos.UploadProfilePhotoRequest(
                 await self.client.upload_file(buf)
             ))
+            buf.close()
             await asyncio.sleep(timeout_autopfp)
 
     async def stopautopfpcmd(self, message):
