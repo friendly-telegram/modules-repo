@@ -86,26 +86,24 @@ class AutoProfileMod(loader.Module):
             await self.client.download_profile_photo('me', file=pfp)
             raw_pfp = Image.open(pfp)
 
-        self.pfp_enabled = True
-        pfp_degree = 0
-        await utils.answer(message, "<b>Successfully enabled autopfp.</b>")
+            self.pfp_enabled = True
+            pfp_degree = 0
+            await utils.answer(message, "<b>Successfully enabled autopfp.</b>")
 
-        while self.pfp_enabled:
-            pfp_degree = (pfp_degree + degrees) % 360
-            rotated = raw_pfp.rotate(pfp_degree)
-            with BytesIO() as buf:
-                rotated.save(buf, format='JPEG')
-                buf.seek(0)
+            while self.pfp_enabled:
+                pfp_degree = (pfp_degree + degrees) % 360
+                rotated = raw_pfp.rotate(pfp_degree)
+                with BytesIO() as buf:
+                    rotated.save(buf, format='JPEG')
+                    buf.seek(0)
 
-                if delete_previous:
-                    await self.client(functions.photos.DeletePhotosRequest(
-                        await self.client.get_profile_photos('me', limit=1)))
+                    if delete_previous:
+                        await self.client(functions.photos.
+                                          DeletePhotosRequest(await self.client.get_profile_photos('me', limit=1)))
 
-                await self.client(functions.photos.UploadProfilePhotoRequest(
-                    await self.client.upload_file(buf)
-                ))
-                buf.close()
-            await asyncio.sleep(timeout_autopfp)
+                    await self.client(functions.photos.UploadProfilePhotoRequest(await self.client.upload_file(buf)))
+                    buf.close()
+                await asyncio.sleep(timeout_autopfp)
 
     async def stopautopfpcmd(self, message):
         """ Stop autobio cmd."""
