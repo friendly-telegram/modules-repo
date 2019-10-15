@@ -43,7 +43,6 @@ class AutoProfileMod(loader.Module):
         self.bio_enabled = False
         self.name_enabled = False
         self.pfp_enabled = False
-        self.pfp_remove_latest = None
         self.raw_bio = None
         self.raw_name = None
 
@@ -83,11 +82,10 @@ class AutoProfileMod(loader.Module):
         except (ValueError, SyntaxError):
             return await utils.answer(message, _("<b>Please pass True or False for previous pfp removal.</b>"))
 
-        pfp = BytesIO()
-        await self.client.download_profile_photo('me', file=pfp)
-        raw_pfp = Image.open(pfp)
+        with BytesIO() as pfp:
+            await self.client.download_profile_photo('me', file=pfp)
+            raw_pfp = Image.open(pfp)
 
-        self.pfp_remove_latest = delete_previous
         self.pfp_enabled = True
         pfp_degree = 0
         await utils.answer(message, "<b>Successfully enabled autopfp.</b>")
@@ -95,19 +93,18 @@ class AutoProfileMod(loader.Module):
         while self.pfp_enabled:
             pfp_degree = (pfp_degree + degrees) % 360
             rotated = raw_pfp.rotate(pfp_degree)
-            buf = BytesIO()
-            rotated.save(buf, format='JPEG')
-            buf.seek(0)
+            with BytesIO() as buf:
+                rotated.save(buf, format='JPEG')
+                buf.seek(0)
 
-            if self.pfp_remove_latest:
-                await self.client(functions.photos.DeletePhotosRequest(
-                    await self.client.get_profile_photos('me', limit=1)
+                if delete_previous:
+                    await self.client(functions.photos.DeletePhotosRequest(
+                        await self.client.get_profile_photos('me', limit=1)))
+
+                await self.client(functions.photos.UploadProfilePhotoRequest(
+                    await self.client.upload_file(buf)
                 ))
-
-            await self.client(functions.photos.UploadProfilePhotoRequest(
-                await self.client.upload_file(buf)
-            ))
-            buf.close()
+                buf.close()
             await asyncio.sleep(timeout_autopfp)
 
     async def stopautopfpcmd(self, message):
