@@ -60,7 +60,7 @@ class AutoProfileMod(loader.Module):
         if not pil_installed:
             return await utils.answer(message, _("<b>You don't have PIL (Pillow) installed.</b>"))
 
-        if not await self.client.get_profile_photos('me', limit=1):
+        if not await self.client.get_profile_photos("me", limit=1):
             return await utils.answer(message, _("<b>You don't have a profile pic set.</b>"))
 
         msg = utils.get_args(message)
@@ -83,7 +83,7 @@ class AutoProfileMod(loader.Module):
             return await utils.answer(message, _("<b>Please pass True or False for previous pfp removal.</b>"))
 
         with BytesIO() as pfp:
-            await self.client.download_profile_photo('me', file=pfp)
+            await self.client.download_profile_photo("me", file=pfp)
             raw_pfp = Image.open(pfp)
 
             self.pfp_enabled = True
@@ -94,19 +94,19 @@ class AutoProfileMod(loader.Module):
                 pfp_degree = (pfp_degree + degrees) % 360
                 rotated = raw_pfp.rotate(pfp_degree)
                 with BytesIO() as buf:
-                    rotated.save(buf, format='JPEG')
+                    rotated.save(buf, format="JPEG")
                     buf.seek(0)
 
                     if delete_previous:
                         await self.client(functions.photos.
-                                          DeletePhotosRequest(await self.client.get_profile_photos('me', limit=1)))
+                                          DeletePhotosRequest(await self.client.get_profile_photos("me", limit=1)))
 
                     await self.client(functions.photos.UploadProfilePhotoRequest(await self.client.upload_file(buf)))
                     buf.close()
                 await asyncio.sleep(timeout_autopfp)
 
     async def stopautopfpcmd(self, message):
-        """ Stop autobio cmd."""
+        """Stop autobio cmd."""
 
         if self.pfp_enabled is False:
             return await utils.answer(message, _("<b>Autopfp is already disabled.</b>"))
@@ -114,12 +114,12 @@ class AutoProfileMod(loader.Module):
             self.pfp_enabled = False
 
             await self.client(functions.photos.DeletePhotosRequest(
-                await self.client.get_profile_photos('me', limit=1)
+                await self.client.get_profile_photos("me", limit=1)
             ))
             await utils.answer(message, _("<b>Successfully disabled autobio, removing last profile pic.</b>"))
 
     async def autobiocmd(self, message):
-        """ Automatically changes your Telegram's bio with current time, usage:
+        """Automatically changes your account's bio with current time, usage:
             .autobio <timeout, seconds> '<message, time as {time}>'"""
 
         msg = utils.get_args(message)
@@ -131,7 +131,7 @@ class AutoProfileMod(loader.Module):
                 timeout_autobio = int(msg[0])
             except ValueError:
                 return await utils.answer(message, _("<b>Wrong time.</b>"))
-        if '{time}' not in raw_bio:
+        if "{time}" not in raw_bio:
             return await utils.answer(message, _("<b>You haven't specified time position/Wrong format.</b>"))
 
         self.bio_enabled = True
@@ -147,7 +147,7 @@ class AutoProfileMod(loader.Module):
             await asyncio.sleep(timeout_autobio)
 
     async def stopautobiocmd(self, message):
-        """ Stop autobio cmd."""
+        """Stop autobio cmd."""
 
         if self.bio_enabled is False:
             return await utils.answer(message, _("<b>Autobio is already disabled.</b>"))
@@ -159,7 +159,7 @@ class AutoProfileMod(loader.Module):
             ))
 
     async def autonamecmd(self, message):
-        """ Automatically changes your Telegram name with current time, usage:
+        """Automatically changes your Telegram name with current time, usage:
             .autoname <timeout, seconds> '<message, time as {time}>'"""
 
         msg = utils.get_args(message)
@@ -203,26 +203,22 @@ class AutoProfileMod(loader.Module):
         .delpfp <pfps count/unlimited - remove all>"""
 
         args = utils.get_args(message)
-
         if not args:
-            return await utils.answer(message, _("<b>Please specify amount of profile pics to remove. </b>"))
-
-        if args[0].lower() == 'unlimited':
+            return await utils.answer(message, _("<b>Please specify number of profile pics to remove.</b>"))
+        if args[0].lower() == "unlimited":
             pfps_count = None
         else:
             try:
                 pfps_count = int(args[0])
             except ValueError:
                 return await utils.answer(message, _("<b>Wrong amount of pfps.</b>"))
-
             if pfps_count <= 0:
-                return await utils.answer(message, _("<b>Please provide positive int.</b>"))
+                return await utils.answer(message, _("<b>Please provide positive number of" +
+                                                     " profile pictures to remove.</b>"))
 
-        await self.client(functions.photos.DeletePhotosRequest(
-            await self.client.get_profile_photos('me', limit=pfps_count)
-        ))
+        await self.client(functions.photos.DeletePhotosRequest(await self.client.get_profile_photos("me",
+                                                                                                    limit=pfps_count)))
 
         if pfps_count is None:
-            pfps_count = '(all)'
-
+            pfps_count = _("all")
         await utils.answer(message, _("<b>Removed </b><code>{}</code><b> profile pic(s).</b>".format(str(pfps_count))))
