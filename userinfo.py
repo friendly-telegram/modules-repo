@@ -41,7 +41,10 @@ class UserInfoMod(loader.Module):
             args = utils.get_args(message)
             if not args:
                 return await utils.answer(message, '<b>No args or reply was provided.</b>')
-            full = await self.client(GetFullUserRequest(args[0]))
+            try:
+                full = await self.client(GetFullUserRequest(args[0]))
+            except ValueError:
+                return await utils.answer(message, _("<b>Couldn't find that user.</b>"))
         logger.debug(full)
         reply = _("First name: <code>{}</code>").format(utils.escape_html(ascii(full.user.first_name)))
         if full.user.last_name is not None:
