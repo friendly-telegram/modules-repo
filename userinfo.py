@@ -48,6 +48,11 @@ class UserInfoMod(loader.Module):
             reply += _("\nLast name: <code>{}</code>").format(utils.escape_html(ascii(full.user.last_name)))
         reply += _("\nBio: <code>{}</code>").format(utils.escape_html(ascii(full.about)))
         reply += _("\nRestricted: <code>{}</code>").format(utils.escape_html(str(full.user.restricted)))
+        reply += _("\nDeleted: <code>{}</code>").format(utils.escape_html(str(full.user.deleted)))
+        reply += _("\nBot: <code>{}</code>").format(utils.escape_html(str(full.user.bot)))
+        reply += _("\nVerified: <code>{}</code>").format(utils.escape_html(str(full.user.verified)))
+        if full.user.photo:
+            reply += _("\nDC ID: <code>{}</code>").format(utils.escape_html(str(full.user.photo.dc_id)))
         await message.edit(reply)
 
     async def permalinkcmd(self, message):
