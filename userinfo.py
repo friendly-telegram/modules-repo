@@ -39,6 +39,8 @@ class UserInfoMod(loader.Module):
             full = await self.client(GetFullUserRequest((await message.get_reply_message()).from_id))
         else:
             args = utils.get_args(message)
+            if not args:
+                return await utils.answer(message, '<b>No args or reply was provided.</b>')
             full = await self.client(GetFullUserRequest(args[0]))
         logger.debug(full)
         reply = _("First name: <code>{}</code>").format(utils.escape_html(ascii(full.user.first_name)))
