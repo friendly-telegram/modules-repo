@@ -197,3 +197,32 @@ class AutoProfileMod(loader.Module):
             await self.client(functions.account.UpdateProfileRequest(
                 first_name=self.raw_name.format(time="")
             ))
+
+    async def delpfpcmd(self, message):
+        """ Remove x profile pic(s) from your profile.
+        .delpfp <pfps count/unlimited - remove all>"""
+
+        args = utils.get_args(message)
+
+        if not args:
+            return await utils.answer(message, _("<b>Please specify amount of profile pics to remove. </b>"))
+
+        if args[0].lower() == 'unlimited':
+            pfps_count = None
+        else:
+            try:
+                pfps_count = int(args[0])
+            except ValueError:
+                return await utils.answer(message, _("<b>Wrong amount of pfps.</b>"))
+
+            if pfps_count <= 0:
+                return await utils.answer(message, _("<b>Please provide positive int.</b>"))
+
+        await self.client(functions.photos.DeletePhotosRequest(
+            await self.client.get_profile_photos('me', limit=pfps_count)
+        ))
+
+        if pfps_count is None:
+            pfps_count = '(all)'
+
+        await utils.answer(message, _("<b>Removed </b><code>{}</code><b> profile pic(s).</b>".format(str(pfps_count))))
