@@ -213,8 +213,8 @@ class AutoProfileMod(loader.Module):
             except ValueError:
                 return await utils.answer(message, _("<b>Wrong amount of pfps.</b>"))
             if pfps_count <= 0:
-                return await utils.answer(message, _("<b>Please provide positive number of" +
-                                                     " profile pictures to remove.</b>"))
+                return await utils.answer(message, _("<b>Please provide positive number of"
+                                                     + " profile pictures to remove.</b>"))
 
         await self.client(functions.photos.DeletePhotosRequest(await self.client.get_profile_photos("me",
                                                                                                     limit=pfps_count)))
