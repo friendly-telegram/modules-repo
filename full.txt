@@ -21,6 +21,7 @@ transfersh
 translate
 tts
 typer
+urbandictionary
 userinfo
 weather
 xda
