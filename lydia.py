@@ -123,9 +123,11 @@ class LydiaMod(loader.Module):
             return
 
         old = self._db.get(__name__, "force")
-        if [utils.get_chat_id(message), user] in old:
+        try:
             old.remove([utils.get_chat_id(), user])
             self._db.set(__name__, "force", old)
+        except (ValueError, TypeError):
+            pass
         self._db.set(__name__, "allow", self._db.get(__name__, "allow", []) + [user])
         await message.edit(_("<code>AI disabled for this user.</code>"))
 
