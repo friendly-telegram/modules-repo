@@ -108,7 +108,7 @@ class LydiaMod(loader.Module):
         if user is None:
             await utils.answer(message, _("<code>Cannot find that user.</code>"))
             return
-        self._db.set(__name__, "force", self._db.get(__name__, "force", []) + [[utils.get_chat_id(), user]])
+        self._db.set(__name__, "force", self._db.get(__name__, "force", []) + [[utils.get_chat_id(message), user]])
         await utils.answer(message, _("<code>AI enabled for that user in this chat.</code>"))
 
     async def dislydiacmd(self, message):
@@ -124,7 +124,7 @@ class LydiaMod(loader.Module):
 
         old = self._db.get(__name__, "force")
         try:
-            old.remove([utils.get_chat_id(), user])
+            old.remove([utils.get_chat_id(message), user])
             self._db.set(__name__, "force", old)
         except (ValueError, TypeError, AttributeError):
             pass
