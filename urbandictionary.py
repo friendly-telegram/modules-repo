@@ -49,4 +49,4 @@ class UrbanDictionaryMod(loader.Module):
             return await utils.answer(message, _("<b>Couldn't find definition for that.</b>"))
 
         await utils.answer(message, _("<b>Text</b>: <code>{}</code>\n<b>Meaning</b>: <code>{}\n<b>Example</b>: "
-                                      + "<code>{}</code>".format(args, definition[0]['def'], definition[0]['example'])))
+                                      + "<code>{}</code>").format(args, definition[0]['def'], definition[0]['example'])))
