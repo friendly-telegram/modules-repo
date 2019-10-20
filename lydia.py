@@ -37,7 +37,9 @@ def register(cb):
 class LydiaMod(loader.Module):
     """Talks to a robot instead of a human"""
     def __init__(self):
-        self.config = loader.ModuleConfig("CLIENT_KEY", "", "The API key for lydia, acquire from @IntellivoidDev")
+        self.config = loader.ModuleConfig("CLIENT_KEY", "", _("The API key for lydia, acquire from @IntellivoidDev"),
+                                          "IGNORE_NO_COMMON", False, _("Boolean to ignore users who have no chats "
+                                                                       + "in common with you"))
         self.name = _("Lydia anti-PM")
         self._ratelimit = []
         self._cleanup = None
@@ -156,6 +158,10 @@ class LydiaMod(loader.Module):
                     return
                 if len(message.message) == 0:
                     return
+                if self.config["IGNORE_NO_COMMON"]:
+                    fulluser = await message.client(functions.users.GetFullUserReqeust(await utils.get_user(message)))
+                    if fulluser.common_chats_count == 0:
+                        return
                 await message.client(functions.messages.SetTypingRequest(
                     peer=await utils.get_user(message),
                     action=types.SendMessageTypingAction()
