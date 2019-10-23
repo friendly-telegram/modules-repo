@@ -35,14 +35,17 @@ class PurgeMod(loader.Module):
             await message.edit(_("From where shall I purge?"))
             return
         msgs = []
+        from_ids = set()
         async for msg in message.client.iter_messages(
                 entity=message.to_id,
                 min_id=message.reply_to_msg_id,
                 reverse=True):
             msgs += [msg.id]
+            from_ids.add(message.from_id)
             # No async list comprehension in 3.5
         logger.debug(msgs)
         await message.client.delete_messages(message.to_id, msgs + [message.reply_to_msg_id])
+        await self.allmodules.log("purge", group=message.to_id, affected_uids=from_ids)
 
     async def delcmd(self, message):
         """Delete the replied message"""
@@ -57,3 +60,4 @@ class PurgeMod(loader.Module):
             msgs += [(await message.get_reply_message()).id]
         logger.debug(msgs)
         await message.client.delete_messages(message.to_id, msgs)
+        await self.allmodules.log("delete", group=message.to_id, affected_uids=[msgs[-1].from_id])

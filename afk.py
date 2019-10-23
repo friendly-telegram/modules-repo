@@ -45,12 +45,14 @@ class AFKMod(loader.Module):
             self._db.set(__name__, "afk", utils.get_args_raw(message))
         else:
             self._db.set(__name__, "afk", True)
+        await self.allmodules.log("afk", data=utils.get_args_raw(message) or None)
         await message.edit(_("<code>I'm AFK</code>"))
 
     async def unafkcmd(self, message):
         """Remove the AFK status"""
         self._ratelimit.clear()
         self._db.set(__name__, "afk", False)
+        await self.allmodules.log("unafk")
         await message.edit(_("<code>I'm no longer AFK</code>"))
 
     async def watcher(self, message):

@@ -88,6 +88,7 @@ class AutoProfileMod(loader.Module):
 
             self.pfp_enabled = True
             pfp_degree = 0
+            await self.allmodules.log("start_autopfp")
             await utils.answer(message, "<b>Successfully enabled autopfp.</b>")
 
             while self.pfp_enabled:
@@ -116,6 +117,7 @@ class AutoProfileMod(loader.Module):
             await self.client(functions.photos.DeletePhotosRequest(
                 await self.client.get_profile_photos("me", limit=1)
             ))
+            await self.allmodules.log("stop_autopfp")
             await utils.answer(message, _("<b>Successfully disabled autobio, removing last profile pic.</b>"))
 
     async def autobiocmd(self, message):
@@ -136,6 +138,7 @@ class AutoProfileMod(loader.Module):
 
         self.bio_enabled = True
         self.raw_bio = raw_bio
+        await self.allmodules.log("start_autobio")
         await utils.answer(message, _("<b>Successfully enabled autobio.</b>"))
 
         while self.bio_enabled is True:
@@ -153,6 +156,7 @@ class AutoProfileMod(loader.Module):
             return await utils.answer(message, _("<b>Autobio is already disabled.</b>"))
         else:
             self.bio_enabled = False
+            await self.allmodules.log("stop_autobio")
             await utils.answer(message, _("<b>Successfully disabled autobio, setting bio to without time.</b>"))
             await self.client(functions.account.UpdateProfileRequest(
                 about=self.raw_bio.format(time="")
@@ -176,6 +180,7 @@ class AutoProfileMod(loader.Module):
 
         self.name_enabled = True
         self.raw_name = raw_name
+        await self.allmodules.log("start_autoname")
         await utils.answer(message, _("<b>Successfully enabled autoname.</b>"))
 
         while self.name_enabled is True:
@@ -193,6 +198,7 @@ class AutoProfileMod(loader.Module):
             return await utils.answer(message, _("<b>Autoname is already disabled.</b>"))
         else:
             self.name_enabled = False
+            await self.allmodules.log("stop_autoname")
             await utils.answer(message, _("<b>Successfully disabled autoname, setting name to without time.</b>"))
             await self.client(functions.account.UpdateProfileRequest(
                 first_name=self.raw_name.format(time="")
@@ -221,4 +227,5 @@ class AutoProfileMod(loader.Module):
 
         if pfps_count is None:
             pfps_count = _("all")
+        await self.allmodules.log("delpfp")
         await utils.answer(message, _("<b>Removed </b><code>{}</code><b> profile pic(s).</b>".format(str(pfps_count))))

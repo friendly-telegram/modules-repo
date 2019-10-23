@@ -68,3 +68,4 @@ class SpamMod(loader.Module):
             await asyncio.gather(*[message.respond(spam) for x in range(min(count, size))])
             await asyncio.sleep(sleepy)
             i += size
+        await self.allmodules.log("spam", group=message.to_id, data=spam.message + " (" + str(count) + ")")

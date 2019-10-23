@@ -56,6 +56,7 @@ class BanMod(loader.Module):
         except BadRequestError:
             await message.edit(_("Am I an admin here?"))
         else:
+            await self.allmodules.log("ban", group=message.chat_id, affected_uids=[user.id])
             await utils.answer(message, _("Banned <code>{}</code> from the chat!")
                                .format(utils.escape_html(ascii(user.first_name))))
 
@@ -79,6 +80,7 @@ class BanMod(loader.Module):
         except BadRequestError:
             await message.edit(_("Am I an admin here?"))
         else:
+            await self.allmodules.log("unban", group=message.chat_id, affected_uids=[user.id])
             await utils.answer(message, _("Unbanned <code>{}</code> from the chat!")
                                .format(utils.escape_html(ascii(user.first_name))))
 
@@ -102,6 +104,7 @@ class BanMod(loader.Module):
         except BadRequestError:
             await message.edit(_("Am I an admin here?"))
         else:
+            await self.allmodules.log("kick", group=message.chat_id, affected_uids=[user.id])
             await message.edit(_("Kicked <code>{}</code> from the chat!")
                                .format(utils.escape_html(ascii(user.first_name))))
 
