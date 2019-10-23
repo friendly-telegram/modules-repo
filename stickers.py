@@ -71,8 +71,8 @@ class StickersMod(loader.Module):
         else:
             sticker = await message.get_reply_message()
         if not (sticker.sticker or sticker.photo):
-                await message.edit(_("Reply to a sticker or photo to nick it"))
-                return
+            await message.edit(_("Reply to a sticker or photo to nick it"))
+            return
         logger.debug("user did send photo/sticker")
         if len(args) > 1:
             emojis = args[1]
