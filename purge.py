@@ -41,7 +41,7 @@ class PurgeMod(loader.Module):
                 min_id=message.reply_to_msg_id,
                 reverse=True):
             msgs += [msg.id]
-            from_ids.add(message.from_id)
+            from_ids.add(msg.from_id)
             # No async list comprehension in 3.5
         logger.debug(msgs)
         await message.client.delete_messages(message.to_id, msgs + [message.reply_to_msg_id])
