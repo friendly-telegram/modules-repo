@@ -65,13 +65,14 @@ class StickersMod(loader.Module):
                 sticker = message
             else:
                 logger.debug("user didnt send any sticker/photo or reply")
-                await message.edit(_("Reply to a sticker or photo to nick it"))
-                return
+                async for sticker in message.client.iter_messages(message.to_id, 10):
+                    if sticker.sticker or sticker.photo:
+                        break  # Changes message into the right one
         else:
             sticker = await message.get_reply_message()
         if not (sticker.sticker or sticker.photo):
-            await message.edit(_("That ain't no sticca"))
-            return
+                await message.edit(_("Reply to a sticker or photo to nick it"))
+                return
         logger.debug("user did send photo/sticker")
         if len(args) > 1:
             emojis = args[1]
