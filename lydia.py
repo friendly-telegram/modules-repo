@@ -159,7 +159,7 @@ class LydiaMod(loader.Module):
                 if len(message.message) == 0:
                     return
                 if self.config["IGNORE_NO_COMMON"]:
-                    fulluser = await message.client(functions.users.GetFullUserReqeust(await utils.get_user(message)))
+                    fulluser = await message.client(functions.users.GetFullUserRequest(await utils.get_user(message)))
                     if fulluser.common_chats_count == 0:
                         return
                 await message.client(functions.messages.SetTypingRequest(
