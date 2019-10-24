@@ -32,6 +32,8 @@ def register(cb):
 
 
 def deg_to_text(deg):
+    if deg is None:
+        return _("Unknown")
     return ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW",
             "SW", "WSW", "W", "WNW", "NW", "NNW"][round(deg / 22.5) % 16]
 
@@ -94,5 +96,5 @@ class WeatherMod(loader.Module):
                          high=eh(temp['temp_max']), low=eh(temp['temp_min']), avg=eh(temp['temp']),
                          humid=eh(weather.get_humidity()),
                          ws=eh(round_to_sf(weather.get_wind('miles_hour')['speed'], 3)),
-                         wd=eh(deg_to_text(weather.get_wind()['deg'])))
+                         wd=eh(deg_to_text(weather.get_wind().get('deg', None))))
         await message.edit(ret)
