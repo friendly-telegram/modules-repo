@@ -33,7 +33,7 @@ def register(cb):
 
 def deg_to_text(deg):
     if deg is None:
-        return _("Unknown")
+        return _("unknown")
     return ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW",
             "SW", "WSW", "W", "WNW", "NW", "NNW"][round(deg / 22.5) % 16]
 
