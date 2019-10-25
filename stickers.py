@@ -267,6 +267,7 @@ class StickersMod(loader.Module):
         target = await message.get_reply_message()
         if target is None or target.file is None or target.file.mime_type != "application/x-tgsticker":
             await utils.answer(message, _("<code>Please provide an animated sticker to convert to a GIF</code>"))
+            return
         try:
             file = BytesIO()
             await target.download_media(file)
