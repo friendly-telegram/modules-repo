@@ -148,7 +148,7 @@ class LydiaMod(loader.Module):
             logger.debug("no key set for lydia, returning")
             return
         if (isinstance(message.to_id, types.PeerUser) and not self.get_allowed(message.from_id)) or \
-                (self.is_forced(message.chat_id, message.from_id) and not isinstance(message.to_id, types.PeerUser)):
+                (self.is_forced(utils.get_chat_id(message), message.from_id) and not isinstance(message.to_id, types.PeerUser)):
             user = await utils.get_user(message)
             if user.is_self or user.bot or user.verified:
                 logger.debug("User is self, bot or verified.")
