@@ -33,13 +33,13 @@ class MockMod(loader.Module):
 
     async def mockcmd(self, message):
         """Use in reply to another message or as .mock <text>"""
-        if len(utils.get_args_raw(message)) == 0:
-            text = (await message.get_reply_message()).message
-        else:
-            text = utils.get_args_raw(message.message)
+        text = utils.get_args_raw(message.message)
         if len(text) == 0:
-            await message.edit(_("rEpLy To A mEsSaGe To MoCk It (Or TyPe ThE mEsSaGe AfTeR tHe CoMmAnD)"))
-            return
+            if message.is_reply:
+                text = (await message.get_reply_message()).message
+            else:
+                await message.edit(_("rEpLy To A mEsSaGe To MoCk It (Or TyPe ThE mEsSaGe AfTeR tHe CoMmAnD)"))
+                return
         text = list(text)
         n = 0
         rn = 0
