@@ -18,6 +18,7 @@ from .. import loader, utils
 import logging
 import random
 from pyfiglet import Figlet, FigletFont, FontNotFound
+from re import sub
 
 logger = logging.getLogger(__name__)
 
@@ -72,3 +73,19 @@ class MockMod(loader.Module):
             await message.edit(_("<code>Font not found</code>"))
             return
         await message.edit("<code>\u206a" + utils.escape_html(fig.renderText(text)) + "</code>")
+
+    async def uwucmd(self, message):
+        """Use in wepwy to anyothew message ow as .uwu <text>"""
+        text = utils.get_args_raw(message.message)
+        if len(text) == 0:
+            if message.is_reply:
+                text = (await message.get_reply_message()).message
+            else:
+                await message.edit(_("<code>I nyeed some text fow the nyeko.</code>"))
+                return
+        reply_text = sub(r"(r|l)", "w", text)
+        reply_text = sub(r"(R|L)", "W", reply_text)
+        reply_text = sub(r"n([aeiou])", r"ny\1", reply_text)
+        reply_text = sub(r"N([aeiouAEIOU])", r"Ny\1", reply_text)
+        reply_text = reply_text.replace("ove", "uv")
+        await message.edit(reply_text)
