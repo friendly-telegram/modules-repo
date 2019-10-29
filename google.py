@@ -42,7 +42,7 @@ class GoogleSearchMod(loader.Module):
             text = utils.get_args_raw(message.message)
         if len(text) == 0:
             await message.edit(_("Unfortunately, I can't Google nothing."))
-        #TODO: add ability to specify page number.
+        # TODO: add ability to specify page number.
         search_args = (str(text), 1)
         gsearch = GoogleSearch()
         gresults = await gsearch.async_search(*search_args)
