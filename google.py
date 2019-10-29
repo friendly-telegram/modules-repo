@@ -60,5 +60,5 @@ class GoogleSearchMod(loader.Module):
             await utils.answer(message, _(f"Could not find anything about <code>{text}</code> on Google."))
             return
         else:
-            await utils.answer(message, _(f"These came back from a Google search for <code>{text}</code>\
-            \n\n{msg}:"))
+            await utils.answer(message, _(f"These came back from a Google search for <code>{text}</code>:\
+            \n\n{msg}"))
