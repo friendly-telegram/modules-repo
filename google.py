@@ -18,11 +18,11 @@
 
 import logging
 
+from search_engine_parser import GoogleSearch
+
 from .. import loader, utils
 
 logger = logging.getLogger(__name__)
-
-from search_engine_parser import GoogleSearch
 
 
 def register(cb):
