@@ -17,8 +17,8 @@
 from .. import loader, utils
 import logging
 import random
+import re
 from pyfiglet import Figlet, FigletFont, FontNotFound
-from re import sub
 
 logger = logging.getLogger(__name__)
 
@@ -83,9 +83,9 @@ class MockMod(loader.Module):
             else:
                 await message.edit(_("<code>I nyeed some text fow the nyeko.</code>"))
                 return
-        reply_text = sub(r"(r|l)", "w", text)
-        reply_text = sub(r"(R|L)", "W", reply_text)
-        reply_text = sub(r"n([aeiou])", r"ny\1", reply_text)
-        reply_text = sub(r"N([aeiouAEIOU])", r"Ny\1", reply_text)
+        reply_text = re.sub(r"(r|l)", "w", text)
+        reply_text = re.sub(r"(R|L)", "W", reply_text)
+        reply_text = re.sub(r"n([aeiouAEIOU])", r"ny\1", reply_text)
+        reply_text = re.sub(r"N([aeiouAEIOU])", r"Ny\1", reply_text)
         reply_text = reply_text.replace("ove", "uv")
         await message.edit(reply_text)
