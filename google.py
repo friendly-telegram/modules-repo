@@ -32,7 +32,7 @@ def register(cb):
 class GoogleSearchMod(loader.Module):
     """Make a Google search, right in your chat!"""
     def __init__(self):
-        self.name = _("Google Search")
+        self.name = _("Search Engine")
 
     async def googlecmd(self, message):
         """Shows Google search results."""
@@ -41,20 +41,24 @@ class GoogleSearchMod(loader.Module):
         else:
             text = utils.get_args_raw(message.message)
         if len(text) == 0:
-            await message.edit(_("Unfortunately, I can't search nothing."))
+            await message.edit(_("Unfortunately, I can't Google nothing."))
         #TODO: add ability to specify page number.
         search_args = (str(text), 1)
         gsearch = GoogleSearch()
         gresults = await gsearch.async_search(*search_args)
         msg = ""
-        for i in range(5):
+        for i in range(len(gresults["titles"])):
             try:
                 title = gresults["titles"][i]
                 link = gresults["links"][i]
                 desc = gresults["descriptions"][i]
-                #msg += f"[{title}]({link})\n`{desc}`\n\n"
-                msg+=f"<p><a href='{link}'>{title}</a></p>\
+                msg += f"<p><a href='{link}'>{title}</a></p>\
                 \n<code>{desc}</code>\n\n"
             except IndexError:
                 break
-        await utils.answer(message, _(f"{msg}"))
+        if msg == "":
+            await utils.answer(message, _(f"Could not find anything about <code>{text}</code> on Google."))
+            return
+        else:
+            await utils.answer(message, _(f"These came back from a Google search for <code>{text}</code>\
+            \n\n{msg}:"))
