@@ -3,6 +3,7 @@ afk
 autoprofile
 b_emoji
 forward
+google
 info
 insult
 lydia
