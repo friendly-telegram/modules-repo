@@ -37,6 +37,9 @@ class TyperMod(loader.Module):
     async def typecmd(self, message):
         """.type <message>"""
         a = utils.get_args_raw(message)
+        if not a:
+            await utils.answer(message, _("<code>You can't type nothing!</code>"))
+            return
         m = ""
         for c in a:
             m += self.config["TYPE_CHAR"]
@@ -49,7 +52,6 @@ class TyperMod(loader.Module):
 
 async def update_message(message, m):
     try:
-        await message.edit(m)
+        return await message.edit(m)
     except MessageNotModifiedError:
-        pass  # space doesnt count
-    return message
+        return message  # space doesnt count
