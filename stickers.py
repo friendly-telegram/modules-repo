@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 try:
     import tgs
 except OSError:
-    logger.exception()
+    logger.exception("TGS not available")
 
 warnings.simplefilter('error', Image.DecompressionBombWarning)
 
