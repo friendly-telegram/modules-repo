@@ -69,19 +69,19 @@ class UserInfoMod(loader.Module):
         except ValueError:
             user = args[0]
         try:
-            user = await self.client.get_input_entity(user)
+            user = await self.client.get_entity(user)
         except ValueError as e:
             logger.debug(e)
             # look for the user
             await message.edit(_("Searching for user..."))
             await self.client.get_dialogs()
             try:
-                user = await self.client.get_input_entity(user)
+                user = await self.client.get_entity(user)
             except ValueError:
                 await message.edit(_("Can't find user."))
                 return
         if len(args) > 1:
-            await utils.answer(message, "<a href='tg://user?id={uid}'>{txt}</a>".format(uid=user.user_id, txt=args[1]))
+            await utils.answer(message, "<a href='tg://user?id={uid}'>{txt}</a>".format(uid=user.id, txt=args[1]))
         else:
             await message.edit(_("<a href='tg://user?id={uid}'>Permalink to {uid}</a>").format(uid=user.user_id))
 
