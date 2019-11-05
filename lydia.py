@@ -53,8 +53,6 @@ class LydiaMod(loader.Module):
 
     async def schedule_cleanups(self):
         """Cleans up dead sessions and reschedules itself to run when the next session expiry takes place"""
-        if self._cleanup is not None:
-            self._cleanup.cancel()
         sessions = self._db.get(__name__, "sessions", {})
         if len(sessions) == 0:
             return
@@ -64,9 +62,10 @@ class LydiaMod(loader.Module):
             if not session["expires"] < t:
                 nsessions.update({ident: session})
             else:
-                session = self._lydia.get_session(session["id"])
-                if session["available"]:
+                session = await utils.run_sync(self._lydia.get_session, session["session_id"])
+                if session.available:
                     nsessions.update({ident: session})
+                pass
         if len(nsessions) > 1:
             next = min(*[v["expires"] for k, v in nsessions.items()])
         elif len(nsessions) == 1:
