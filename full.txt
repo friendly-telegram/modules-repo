@@ -6,6 +6,7 @@ forward
 google
 info
 insult
+lmgtfy
 lydia
 lyrics
 misc
