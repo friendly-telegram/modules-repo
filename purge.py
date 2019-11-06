@@ -40,11 +40,16 @@ class PurgeMod(loader.Module):
                 entity=message.to_id,
                 min_id=message.reply_to_msg_id - 1,
                 reverse=True):
-            msgs += [msg.id]
+            msgs.append(msg.id)
             from_ids.add(msg.from_id)
+            if len(msgs) >= 99:
+                logger.debug(msgs)
+                await message.client.delete_messages(message.to_id, msgs)
+                msgs.clear()
             # No async list comprehension in 3.5
-        logger.debug(msgs)
-        await message.client.delete_messages(message.to_id, msgs)
+        if msgs:
+            logger.debug(msgs)
+            await message.client.delete_messages(message.to_id, msgs)
         await self.allmodules.log("purge", group=message.to_id, affected_uids=from_ids)
 
     async def delcmd(self, message):
