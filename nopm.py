@@ -85,7 +85,8 @@ class AntiPMMod(loader.Module):
             if self.get_allowed(message.from_id):
                 logger.debug("Authorised pm detected")
             else:
-                await message.respond(_("<code>Please do not PM me. You will get reported spam.</code>"))
+                await message.respond(_("Hey there! Unfortunately, I don't accept private messages from strangers. "
+                                        "Please contact me in a group, or <b>wait</b> for me to approve you."))
 
     def get_allowed(self, id):
         return id in self._db.get(__name__, "allow", [])
