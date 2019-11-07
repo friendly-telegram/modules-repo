@@ -67,10 +67,14 @@ class AFKMod(loader.Module):
             if user.is_self or user.bot or user.verified:
                 logger.debug("User is self, bot or verified.")
                 return
+            ret = _("Sorry, I'm not here right now. I'll get back to you when I get a chance.\n\n{}")
             if self.get_afk() is True:
-                await message.reply(_("<code>I'm AFK!</code>"))
+                ret = ret.format("")
             elif self.get_afk() is not False:
-                await message.reply(f"<code>{utils.escape_html(self.get_afk())}</code>")
+                ret = ret.format(_(f"Reason: <i>{utils.escape_html(self.get_afk())}</i>"))
+            else:
+                return
+            await utils.answer(message, ret)
 
     def get_afk(self):
         return self._db.get(__name__, "afk", False)
