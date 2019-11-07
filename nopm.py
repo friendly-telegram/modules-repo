@@ -61,16 +61,13 @@ class AntiPMMod(loader.Module):
             self._db.set(__name__, "allow", old)
         except ValueError:
             pass
-        if message.is_reply:
+        if message.is_reply and isinstance(message.to_id, types.PeerChannel):
             # Report the message
-            await message.client(functions.messages.ReportRequest(peer=await message.client
-                                                                  .get_input_entity(message.to_id),
-                                                                  ids=[message.reply_to_msg_id],
+            await message.client(functions.messages.ReportRequest(peer=message.chat_id,
+                                                                  id=[message.reply_to_msg_id],
                                                                   reason=types.InputReportReasonSpam()))
         else:
-            await message.client(functions.account.ReportPeerRequest(peer=await message.client
-                                                                     .get_input_entity(message.to_id),
-                                                                     reason=types.InputReportReasonSpam()))
+            await message.client(functions.messages.ReportSpamRequest(peer=message.to_id))
         await message.edit("<code>You just got reported spam!</code>")
 
     async def watcher(self, message):
