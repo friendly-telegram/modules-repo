@@ -83,7 +83,7 @@ class UserInfoMod(loader.Module):
         if len(args) > 1:
             await utils.answer(message, "<a href='tg://user?id={uid}'>{txt}</a>".format(uid=user.id, txt=args[1]))
         else:
-            await message.edit(_("<a href='tg://user?id={uid}'>Permalink to {uid}</a>").format(uid=user.user_id))
+            await message.edit(_("<a href='tg://user?id={uid}'>Permalink to {uid}</a>").format(uid=user.id))
 
     async def client_ready(self, client, db):
         self.client = client
