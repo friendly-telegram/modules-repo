@@ -90,3 +90,7 @@ class MiscMod(loader.Module):
     async def huaweicmd(self, message):
         """Use when your country is "investing" in Huawei 5G modems"""
         await message.edit(self.config["HUAWEI_TEXT"])
+
+    async def btcmd(self, message):
+        """Blue text must click"""
+        await message.edit("/BLUE /TEXT \n/MUST /CLICK \n/I /AM /A /STUPID /ANIMAL /ATTRACTED /TO /COLORS")
