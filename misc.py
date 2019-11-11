@@ -62,7 +62,7 @@ class MiscMod(loader.Module):
                          + "will have a new A.I in the camera app to enhance dick pics, but you need to agree to "
                          + "the new privacy policy of sharing the nudes you capture to us, for \"product improvement\"",
                          "", "F_LENGTHS", [5, 1, 1, 4, 1, 1, 1], "List to customise size of F shape", "BLUE_TEXT",
-                         "/BLUE /TEXT \n/MUST /CLICK \n/I /AM /A /STUPID /ANIMAL /ATTRACTED /TO /COLORS",
+                         "/BLUE /TEXT\n/MUST /CLICK\n/I /AM /A /STUPID /ANIMAL /ATTRACTED /TO /COLORS",
                          "Blue text must click!11!!1!1")
         self.name = _("Miscellaneous")
 
