@@ -18,8 +18,7 @@
 
 import logging
 
-from urbandict import define
-from urllib.error import HTTPError
+import asyncurban
 from .. import loader, utils
 
 logger = logging.getLogger(__name__)
@@ -33,6 +32,7 @@ class UrbanDictionaryMod(loader.Module):
     """Define word meaning using UrbanDictionary."""
     def __init__(self):
         self.name = _("Urban Dictionary")
+        self.urban = asyncurban.UrbanDictionary()
 
     async def urbancmd(self, message):
         """Define word meaning. Usage:
@@ -44,9 +44,9 @@ class UrbanDictionaryMod(loader.Module):
             return await utils.answer(message, _("<b>Provide a word(s) to define.</b>"))
 
         try:
-            definition = define(args)
-        except HTTPError:
+            definition = await self.urban.get_word(args)
+        except asyncurban.WordNotFoundError:
             return await utils.answer(message, _("<b>Couldn't find definition for that.</b>"))
 
-        await utils.answer(message, _("<b>Text</b>: <code>{}</code>\n<b>Meaning</b>: <code>{}\n<b>Example</b>: "
-                                      + "<code>{}</code>").format(args, definition[0]['def'], definition[0]['example']))
+        await utils.answer(message, _("<b>Text</b>: <code>{}</code>\n<b>Meaning</b>: <code>{}\n<b>Example</b>: <code>"
+                                      "{}</code>").format(definition.word, definition.definition, definition.example))
