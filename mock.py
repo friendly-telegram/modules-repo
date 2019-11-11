@@ -89,3 +89,12 @@ class MockMod(loader.Module):
         reply_text = re.sub(r"N([aeiouAEIOU])", r"Ny\1", reply_text)
         reply_text = reply_text.replace("ove", "uv")
         await message.edit(reply_text)
+
+    async def shoutcmd(message):
+        """.shoutout <text> makes the text massive"""
+        text = utils.get_args_raw(message)
+        if not text:
+            await message.edit(_("You can't shout nothing."))
+            return
+        result = " ".join(text) + "\n" + "\n".join(sym + " " * (pos * 2 + 1) + sym for pos, sym in enumerate(text[1:]))
+        await utils.answer(message, "<code>" + utils.escape_html(result) + "</code>")
