@@ -90,7 +90,7 @@ class MockMod(loader.Module):
         reply_text = reply_text.replace("ove", "uv")
         await message.edit(reply_text)
 
-    async def shoutcmd(message):
+    async def shoutcmd(self, message):
         """.shoutout <text> makes the text massive"""
         text = utils.get_args_raw(message)
         if not text:
