@@ -45,36 +45,36 @@ class InfoMod(loader.Module):
         reply += "\n" + _("Arch: {}").format(utils.escape_html(platform.architecture()[0]))
         reply += "\n" + _("OS: {}").format(utils.escape_html(platform.system()))
 
-        if platform.system() == 'Linux':
+        if platform.system() == "Linux":
             done = False
             try:
-                a = open('/etc/os-release').readlines()
+                a = open("/etc/os-release").readlines()
                 b = {}
                 for line in a:
-                    b[line.split('=')[0]] = line.split('=')[1].strip().strip('"')
+                    b[line.split("=")[0]] = line.split("=")[1].strip().strip("\"")
                 reply += "\n" + _("Linux Distribution: {}").format(utils.escape_html(b["PRETTY_NAME"]))
                 done = True
             except FileNotFoundError:
-                getprop = shutil.which('getprop')
+                getprop = shutil.which("getprop")
                 if getprop is not None:
-                    sdk = await asyncio.create_subprocess_exec(getprop, 'ro.build.version.sdk',
+                    sdk = await asyncio.create_subprocess_exec(getprop, "ro.build.version.sdk",
                                                                stdout=asyncio.subprocess.PIPE)
-                    ver = await asyncio.create_subprocess_exec(getprop, 'ro.build.version.release',
+                    ver = await asyncio.create_subprocess_exec(getprop, "ro.build.version.release",
                                                                stdout=asyncio.subprocess.PIPE)
-                    sec = await asyncio.create_subprocess_exec(getprop, 'ro.build.version.security_patch',
+                    sec = await asyncio.create_subprocess_exec(getprop, "ro.build.version.security_patch",
                                                                stdout=asyncio.subprocess.PIPE)
                     sdks, unused = await sdk.communicate()
                     vers, unused = await ver.communicate()
                     secs, unused = await sec.communicate()
                     if sdk.returncode == 0 and ver.returncode == 0 and sec.returncode == 0:
-                        reply += "\n" + _("Android SDK: {}").format(sdks.decode('utf-8').strip())
-                        reply += "\n" + _("Android Version: {}").format(vers.decode('utf-8').strip())
-                        reply += "\n" + _("Android Security Patch: {}").format(secs.decode('utf-8').strip())
+                        reply += "\n" + _("Android SDK: {}").format(sdks.decode("utf-8").strip())
+                        reply += "\n" + _("Android Version: {}").format(vers.decode("utf-8").strip())
+                        reply += "\n" + _("Android Security Patch: {}").format(secs.decode("utf-8").strip())
                         done = True
             if not done:
                 reply += "\n" + _("Could not determine Linux distribution")
         reply += "\n" + _("Python version: {}").format(utils.escape_html(sys.version))
         reply += "\n" + _("Telethon Version: {}").format(utils.escape_html(telethon.__version__))
-        reply += '</code>'
+        reply += "</code>"
         logger.debug(reply)
         await message.edit(reply)

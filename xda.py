@@ -22,12 +22,12 @@ def register(cb):
     cb(XDAMod())
 
 
-RANDOM_WORDS = {'sur': 6, 'Sir': 6, 'bro': 6, 'yes': 5, 'no': 5, 'bolte': 2, 'bolit': 2, 'bholit': 3, 'volit': 3,
-                'mustah': 4, 'fap': 5, 'lit': 3, 'lmao': 6, 'iz': 7, 'jiosim': 8, 'ijo': 4, 'nut': 7, 'workz': 4,
-                'workang': 4, 'flashabl zip': 6, 'bateri': 6, 'bacup': 6, 'bad englis': 5, 'sar': 5, 'treble wen': 2,
-                'gsi': 6, 'fox bag': 3, 'bag fox': 3, 'fine': 4, 'bast room': 5, 'fax': 3, 'trable': 3, 'kenzo': 4,
-                'plz make room': 3, 'andreid pai': 2, 'when': 4, 'port': 5, 'mtk': 3, 'send moni': 3, 'bad rom': 2,
-                'dot': 4, 'rr': 4, 'linage': 4, 'arrows': 4, 'kernal': 4}
+RANDOM_WORDS = {"sur": 6, "Sir": 6, "bro": 6, "yes": 5, "no": 5, "bolte": 2, "bolit": 2, "bholit": 3, "volit": 3,
+                "mustah": 4, "fap": 5, "lit": 3, "lmao": 6, "iz": 7, "jiosim": 8, "ijo": 4, "nut": 7, "workz": 4,
+                "workang": 4, "flashabl zip": 6, "bateri": 6, "bacup": 6, "bad englis": 5, "sar": 5, "treble wen": 2,
+                "gsi": 6, "fox bag": 3, "bag fox": 3, "fine": 4, "bast room": 5, "fax": 3, "trable": 3, "kenzo": 4,
+                "plz make room": 3, "andreid pai": 2, "when": 4, "port": 5, "mtk": 3, "send moni": 3, "bad rom": 2,
+                "dot": 4, "rr": 4, "linage": 4, "arrows": 4, "kernal": 4}
 
 # Workaround for 3.5
 WORDS_WEIGHTED = [word for word, count in RANDOM_WORDS.items() for i in range(count)]

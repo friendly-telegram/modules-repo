@@ -33,7 +33,7 @@ try:
 except OSError:
     logger.exception("TGS not available")
 
-warnings.simplefilter('error', Image.DecompressionBombWarning)
+warnings.simplefilter("error", Image.DecompressionBombWarning)
 
 
 def register(cb):
@@ -81,7 +81,7 @@ class StickersMod(loader.Module):
         else:
             emojis = self.config["DEFAULT_STICKER_EMOJI"]
         logger.debug(emojis)
-        animated = sticker.file.mime_type == 'application/x-tgsticker'
+        animated = sticker.file.mime_type == "application/x-tgsticker"
         try:
             img = BytesIO()
             await sticker.download_media(file=img)
@@ -256,7 +256,7 @@ class StickersMod(loader.Module):
         finally:
             img.close()
         packurl = utils.escape_html(f"https://t.me/addstickers/{button.text}")
-        await message.edit(_('<code>Sticker added to</code> <a href="{}">pack</a><code>!</code>').format(packurl))
+        await message.edit(_("<code>Sticker added to</code> <a href='{}'>pack</a><code>!</code>").format(packurl))
 
     async def gififycmd(self, message):
         """Convert the replied animated sticker to a GIF"""

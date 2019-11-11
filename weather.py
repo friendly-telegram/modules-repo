@@ -93,8 +93,8 @@ class WeatherMod(loader.Module):
         ret = _("<code>Weather in {loc} is {w} with a high of {high} and a low of {low}, "
                 + "averaging at {avg} with {humid}% humidity and a {ws}mph {wd} wind.")
         ret = ret.format(loc=eh(w.get_location().get_name()), w=eh(w.get_weather().get_detailed_status().lower()),
-                         high=eh(temp['temp_max']), low=eh(temp['temp_min']), avg=eh(temp['temp']),
+                         high=eh(temp["temp_max"]), low=eh(temp["temp_min"]), avg=eh(temp["temp"]),
                          humid=eh(weather.get_humidity()),
-                         ws=eh(round_to_sf(weather.get_wind('miles_hour')['speed'], 3)),
-                         wd=eh(deg_to_text(weather.get_wind().get('deg', None))))
+                         ws=eh(round_to_sf(weather.get_wind("miles_hour")["speed"], 3)),
+                         wd=eh(deg_to_text(weather.get_wind().get("deg", None))))
         await message.edit(ret)

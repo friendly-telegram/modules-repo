@@ -43,7 +43,7 @@ class LetMeGoogleThatForYou(loader.Module):
             return
         query_encoded = text.replace(" ", "+")
         lfy_url = f"http://lmgtfy.com/?s=g&iie=1&q={query_encoded}"
-        payload = {'format': 'json', 'url': lfy_url}
-        r = get('http://is.gd/create.php', params=payload)
-        await utils.answer(message, _(f"Here you go, help yourself.\
-        \n<p><a href='{r.json()['shorturl']}'>{text}</a></p>"))
+        payload = {"format": "json", "url": lfy_url}
+        r = get("http://is.gd/create.php", params=payload)
+        await utils.answer(message, _("Here you go, help yourself."
+                                      "\n<p><a href='{}'>{text}</a></p>").format(r.json()["shorturl"]))

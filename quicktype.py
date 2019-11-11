@@ -42,7 +42,7 @@ class QuickTypeMod(loader.Module):
             await message.edit(_("Go type it urself m8"))
             return
         t = args[0]
-        mess = ' '.join(args[1:])
+        mess = " ".join(args[1:])
         try:
             t = float(t)
         except ValueError:

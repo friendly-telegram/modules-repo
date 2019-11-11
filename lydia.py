@@ -134,12 +134,12 @@ class LydiaMod(loader.Module):
 
     async def cleanlydiadisabledcmd(self, message):
         """ Remove all lydia-disabled users from DB. """
-        self._db.set(__name__, 'allow', [])
+        self._db.set(__name__, "allow", [])
         return await utils.answer(message, _("<code>Successfully cleaned up lydia-disabled IDs</code>"))
 
     async def cleanlydiasessionscmd(self, message):
         """Remove all active and not active lydia sessions from DB"""
-        self._db.set(__name__, 'sessions', {})
+        self._db.set(__name__, "sessions", {})
         return await utils.answer(message, _("<code>Successfully cleaned up lydia sessions.</code>"))
 
     async def watcher(self, message):

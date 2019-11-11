@@ -46,7 +46,7 @@ class TerminalMod(loader.Module):
     async def aptcmd(self, message):
         """Shorthand for '.terminal apt'"""
         await self.runcmd(message, ("apt " if os.geteuid() == 0 else "sudo -S apt ")
-                          + utils.get_args_raw(message) + ' -y',
+                          + utils.get_args_raw(message) + " -y",
                           RawMessageEditor(message, "apt " + utils.get_args_raw(message), self.config, True))
 
     async def runcmd(self, message, cmd, editor=None):
@@ -215,9 +215,9 @@ class SudoMessageEditor(MessageEditor):
         logger.debug("got here")
         if lastlines[0] == self.PASS_REQ and self.state == 0:
             logger.debug("Success to find sudo log!")
-            text = r'<a href="tg://user?id='
+            text = r"<a href='tg://user?id="
             text += str((await self.message.client.get_me()).id)
-            text += r'">'
+            text += r"'>"
             text += _("Interactive authentication required.")
             text += r"</a>"
             try:
@@ -225,7 +225,7 @@ class SudoMessageEditor(MessageEditor):
             except telethon.errors.rpcerrorlist.MessageNotModifiedError as e:
                 logger.debug(e)
             logger.debug("edited message with link to self")
-            self.authmsg = await self.message.client.send_message('me', _("Please edit this message to the password "
+            self.authmsg = await self.message.client.send_message("me", _("Please edit this message to the password "
                                                                           + "for user {user} to run command {command}")
                                                                   .format(command="<code>"
                                                                           + utils.escape_html(self.command) + "</code>",
@@ -233,7 +233,7 @@ class SudoMessageEditor(MessageEditor):
             logger.debug("sent message to self")
             self.message.client.remove_event_handler(self.on_message_edited)
             self.message.client.add_event_handler(self.on_message_edited,
-                                                  telethon.events.messageedited.MessageEdited(chats=['me']))
+                                                  telethon.events.messageedited.MessageEdited(chats=["me"]))
             logger.debug("registered handler")
             handled = True
         if len(lines) > 1 and (re.fullmatch(self.TOO_MANY_TRIES, lastline)
@@ -285,11 +285,11 @@ class RawMessageEditor(SudoMessageEditor):
     async def redraw(self, skip_wait=False):
         logger.debug(self.rc)
         if self.rc is None:
-            text = '<code>' + utils.escape_html(self.stdout[max(len(self.stdout) - 4095, 0):]) + '</code>'
+            text = "<code>" + utils.escape_html(self.stdout[max(len(self.stdout) - 4095, 0):]) + "</code>"
         elif self.rc == 0:
-            text = '<code>' + utils.escape_html(self.stdout[max(len(self.stdout) - 4090, 0):]) + '</code>'
+            text = "<code>" + utils.escape_html(self.stdout[max(len(self.stdout) - 4090, 0):]) + "</code>"
         else:
-            text = '<code>' + utils.escape_html(self.stderr[max(len(self.stderr) - 4095, 0):]) + '</code>'
+            text = "<code>" + utils.escape_html(self.stderr[max(len(self.stderr) - 4095, 0):]) + "</code>"
         if self.rc is not None and self.show_done:
             text += "\n" + _("Done")
         logger.debug(text)

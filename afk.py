@@ -56,7 +56,7 @@ class AFKMod(loader.Module):
         await message.edit(_("<code>I'm no longer AFK</code>"))
 
     async def watcher(self, message):
-        if message.mentioned or getattr(message.to_id, 'user_id', None) == self._me.id:
+        if message.mentioned or getattr(message.to_id, "user_id", None) == self._me.id:
             logger.debug("tagged!")
             if message.from_id in self._ratelimit:
                 self._ratelimit.remove(message.from_id)
