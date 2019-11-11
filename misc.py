@@ -61,7 +61,9 @@ class MiscMod(loader.Module):
                          + "bank details and I'm selling them to tech support scammers, and by the huaway, EMUI 9.2 "
                          + "will have a new A.I in the camera app to enhance dick pics, but you need to agree to "
                          + "the new privacy policy of sharing the nudes you capture to us, for \"product improvement\"",
-                         "", "F_LENGTHS", [5, 1, 1, 4, 1, 1, 1], "List to customise size of F shape")
+                         "", "F_LENGTHS", [5, 1, 1, 4, 1, 1, 1], "List to customise size of F shape", "BLUE_TEXT",
+                         "/BLUE /TEXT \n /MUST /CLICK \n/I /AM /A /STUPID /ANIMAL /ATTRACTED /TO /COLORS",
+                         "Blue text must click!11!!1!1")
         self.name = _("Miscellaneous")
 
     async def voltecmd(self, message):
@@ -93,4 +95,4 @@ class MiscMod(loader.Module):
 
     async def btcmd(self, message):
         """Blue text must click"""
-        await message.edit("/BLUE /TEXT \n/MUST /CLICK \n/I /AM /A /STUPID /ANIMAL /ATTRACTED /TO /COLORS")
+        await message.edit(self.config["BLUE_TEXT"])
