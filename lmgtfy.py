@@ -46,4 +46,4 @@ class LetMeGoogleThatForYou(loader.Module):
         payload = {"format": "json", "url": lfy_url}
         r = get("http://is.gd/create.php", params=payload)
         await utils.answer(message, _("Here you go, help yourself."
-                                      "\n<p><a href='{}'>{}</a></p>").format(r.json()["shorturl"], text))
+                                      "\n<a href='{}'>{}</a>").format(r.json()["shorturl"], text))
