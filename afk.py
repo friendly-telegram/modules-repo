@@ -19,6 +19,8 @@
 from .. import loader, utils
 
 import logging
+import datetime
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +30,8 @@ def register(cb):
 
 
 class AFKMod(loader.Module):
-    """Provides a message saying that you are unavailable (out of office)"""
+    """Provides a message saying that you are unavailable"""
+
     def __init__(self):
         self.name = _("AFK")
         self._me = None
@@ -39,21 +42,22 @@ class AFKMod(loader.Module):
         self._me = await client.get_me()
 
     async def afkcmd(self, message):
-        """.afk [message]
-           If no message is provided, 'I'm AFK' will be used as default"""
+        """.afk [message]"""
         if utils.get_args_raw(message):
             self._db.set(__name__, "afk", utils.get_args_raw(message))
         else:
             self._db.set(__name__, "afk", True)
+        self._db.set(__name__, "gone", time.time())
         await self.allmodules.log("afk", data=utils.get_args_raw(message) or None)
-        await message.edit(_("<code>I'm AFK</code>"))
+        await utils.answer(message, _("<code>Ma owner's goin' AFK</code>"))
 
     async def unafkcmd(self, message):
         """Remove the AFK status"""
         self._ratelimit.clear()
         self._db.set(__name__, "afk", False)
+        self._db.set(__name__, "gone", None)
         await self.allmodules.log("unafk")
-        await message.edit(_("<code>I'm no longer AFK</code>"))
+        await utils.answer(message, _("<code>My owner's no longer AFK</code>"))
 
     async def watcher(self, message):
         if message.mentioned or getattr(message.to_id, "user_id", None) == self._me.id:
@@ -67,13 +71,15 @@ class AFKMod(loader.Module):
             if user.is_self or user.bot or user.verified:
                 logger.debug("User is self, bot or verified.")
                 return
-            ret = _("Sorry, I'm not here right now. I'll get back to you when I get a chance.\n\n{}")
-            if self.get_afk() is True:
-                ret = ret.format("")
-            elif self.get_afk() is not False:
-                ret = ret.format(_(f"Reason: <i>{utils.escape_html(self.get_afk())}</i>"))
-            else:
+            if self.get_afk() is False:
                 return
+            now = datetime.datetime.now().replace(microsecond=0)
+            gone = datetime.datetime.fromtimestamp(self._db.get(__name__, "gone")).replace(microsecond=0)
+            diff = now - gone
+            if self.get_afk() is True:
+                ret = _("My owner is AFK right now (since {} ago).").format(diff)
+            elif self.get_afk() is not False:
+                ret = _("My owner is AFK right now (since {} ago).\nReason: <i>{}</i>").format(diff, self.get_afk())
             await utils.answer(message, ret)
 
     def get_afk(self):
