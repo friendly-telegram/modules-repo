@@ -49,7 +49,7 @@ class AFKMod(loader.Module):
             self._db.set(__name__, "afk", True)
         self._db.set(__name__, "gone", time.time())
         await self.allmodules.log("afk", data=utils.get_args_raw(message) or None)
-        await utils.answer(message, _("<code>Ma owner's goin' AFK</code>"))
+        await utils.answer(message, _("<code>I'm goin' AFK</code>"))
 
     async def unafkcmd(self, message):
         """Remove the AFK status"""
@@ -57,7 +57,7 @@ class AFKMod(loader.Module):
         self._db.set(__name__, "afk", False)
         self._db.set(__name__, "gone", None)
         await self.allmodules.log("unafk")
-        await utils.answer(message, _("<code>My owner's no longer AFK</code>"))
+        await utils.answer(message, _("<code>I'm no longer AFK</code>"))
 
     async def watcher(self, message):
         if message.mentioned or getattr(message.to_id, "user_id", None) == self._me.id:
@@ -77,9 +77,9 @@ class AFKMod(loader.Module):
             gone = datetime.datetime.fromtimestamp(self._db.get(__name__, "gone")).replace(microsecond=0)
             diff = now - gone
             if self.get_afk() is True:
-                ret = _("My owner is AFK right now (since {} ago).").format(diff)
+                ret = _("I'm AFK right now (since {} ago).").format(diff)
             elif self.get_afk() is not False:
-                ret = _("My owner is AFK right now (since {} ago).\nReason: <i>{}</i>").format(diff, self.get_afk())
+                ret = _("I'm AFK right now (since {} ago).\nReason: <i>{}</i>").format(diff, self.get_afk())
             await utils.answer(message, ret)
 
     def get_afk(self):
