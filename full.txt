@@ -12,6 +12,7 @@ lyrics
 misc
 mock
 nopm
+notes
 purge
 quicktype
 recentactions
