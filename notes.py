@@ -46,6 +46,7 @@ class NotesMod(loader.Module):
         await utils.answer(message, await self._db.fetch_asset(asset_id))
 
     async def savecmd(self, message):
+        """Save a new note. Must be used in reply with one parameter (note name)"""
         if not message.is_reply:
             await utils.answer(message, _("You have to reply to a message to save it to a note"))
             return
