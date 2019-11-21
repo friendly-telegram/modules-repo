@@ -52,7 +52,7 @@ class AntiPMMod(loader.Module):
                              "<code>so you have been blocked!</code>").format(user))
 
     async def unblockcmd(self, message):
-        """Unlock this user to PM"""
+        """Unblock this user to PM"""
         user = await utils.get_target(message)
         if not user:
             await message.edit(_("<code>Specify whom to unblock </code>"))
@@ -103,7 +103,7 @@ class AntiPMMod(loader.Module):
         await message.edit(_("<code>Notifications from denied PMs are silenced.</code>"))
 
     async def notifoncmd(self, message):
-        """Disable the notifications from denied PMs"""
+        """Enable the notifications from denied PMs"""
         self._db.set(__name__, "notif", False)
         await message.edit(_("<code>Notifications from denied PMs are now activated.</code>"))
 
