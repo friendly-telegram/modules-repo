@@ -131,8 +131,9 @@ class AntiPMMod(loader.Module):
                     if limit.get(message.from_id, 0) >= self.config["PM_BLOCK_LIMIT"]:
                         await message.respond(_("<code>Hey! I don't appreciate you barging into my PM like this! "
                                                 "Did you even ask me for approving you to PM? No? Goodbye then."
-                                                "\n\nAh btw, you've been reported as spam already.</code>"))
+                                                "\n\nPS: you've been reported as spam already.</code>"))
                         await message.client(functions.contacts.BlockRequest(message.from_id))
+                        await message.client(functions.messages.ReportSpamRequest(peer=message.from_id))
                         del limit[message.from_id]
                         self._db.set(__name__, "limit", limit)
                     else:
