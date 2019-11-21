@@ -48,8 +48,8 @@ class AntiPMMod(loader.Module):
             await message.edit(_("<code>Specify whom to block</code>"))
             return
         await message.client(functions.contacts.BlockRequest(user))
-        await message.edit(_("<code>My owner doesn't want PM from</code> <a href='tg://user?id={}'>you</a> "
-                             "<code>so you have been blocked</code>").format(user))
+        await message.edit(_("<code>I don't want any PM from</code> <a href='tg://user?id={}'>you</a>, "
+                             "<code>so you have been blocked!</code>").format(user))
 
     async def unblockcmd(self, message):
         """Unlock this user to PM"""
@@ -68,7 +68,7 @@ class AntiPMMod(loader.Module):
             await message.edit(_("<code>Who shall I allow to PM?</code>"))
             return
         self._db.set(__name__, "allow", list(set(self._db.get(__name__, "allow", [])).union({user})))
-        await message.edit(_("<code>My owner has allowed</code> <a href='tg://user?id={}'>you</a> "
+        await message.edit(_("<code>I have allowed</code> <a href='tg://user?id={}'>you</a> "
                              "<code>to PM now</code>").format(user))
 
     async def reportcmd(self, message):
@@ -94,7 +94,7 @@ class AntiPMMod(loader.Module):
             await message.edit(_("<code>Who shall I deny to PM?</code>"))
             return
         self._db.set(__name__, "allow", list(set(self._db.get(__name__, "allow", [])).difference({user})))
-        await message.edit(_("<code>My owner has denied</code> <a href='tg://user?id={}'>you</a> "
+        await message.edit(_("<code>I have denied</code> <a href='tg://user?id={}'>you</a> "
                              "<code>of your PM permissions.</code>").format(user))
 
     async def notifoffcmd(self, message):
