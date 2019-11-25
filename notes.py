@@ -27,36 +27,72 @@ def register(cb):
     cb(NotesMod())
 
 
+@loader.tds
 class NotesMod(loader.Module):
     """Stores global notes (aka snips)"""
-    def __init__(self):
-        self.name = _("Notes")
+    strings = {"name": "Notes",
+               "what_note": "<b>What note should be retrieved?</b>",
+               "no_note": "<b>Note not found</b>",
+               "save_what": "<b>You must reply to a message to save it to a note, or type the note.</b>",
+               "what_name": "<b>You must specify what the note should be called?",
+               "saved": "<b>Note saved</b>",
+               "notes_header": "<b>Saved notes:</b>\n\n",
+               "notes_item": "<b>•</b> <code>{}</code>",
+               "delnote_args": "<b>What note should be deleted?</b>",
+               "delnote_done": "<b>Note deleted</b>"}
+
+    def config_complete(self):
+        self.name = self.strings["name"]
 
     async def notecmd(self, message):
         """Gets the note specified"""
         args = utils.get_args(message)
         if not args:
-            await utils.answer(message, _("What note should be retrieved?"))
+            await utils.answer(message, self.strings["what_note"])
             return
         asset_id = self._db.get(__name__, "notes", {}).get(args[0], None)
         logger.debug(asset_id)
         if asset_id is None:
-            await utils.answer(message, _("Note not found."))
+            await utils.answer(message, self.strings["no_note"])
             return
         await utils.answer(message, await self._db.fetch_asset(asset_id))
 
     async def savecmd(self, message):
         """Save a new note. Must be used in reply with one parameter (note name)"""
-        if not message.is_reply:
-            await utils.answer(message, _("You have to reply to a message to save it to a note"))
-            return
         args = utils.get_args(message)
         if not args:
-            await utils.answer(message, _("You have to provide a name for the note to save"))
+            await utils.answer(message, self.strings["what_name"])
             return
-        asset_id = await self._db.store_asset(await message.get_reply_message())
+        if not message.is_reply:
+            if len(args) < 2:
+                await utils.answer(message, self.strings["save_what"])
+                return
+            else:
+                message.entities = None
+                message.message = args[1]
+                target = message
+                logger.debug(target.message)
+        else:
+            target = await message.get_reply_message()
+        asset_id = await self._db.store_asset(target)
         self._db.set(__name__, "notes", {**self._db.get(__name__, "notes", {}), args[0]: asset_id})
-        await utils.answer(message, _("Note saved"))
+        await utils.answer(message, self.strings["saved"])
+
+    async def delnotecmd(self, message):
+        """Deletes a note, specified by note name"""
+        args = utils.get_args(message)
+        if not args:
+            await utils.answer(message, self.strings["delnote_args"])
+        old = self._db.get(__name__, "notes", {})
+        del old[args[0]]
+        self._db.set(__name__, "notes", old)
+        await utils.answer(message, self.strings["delnote_done"])
+
+    async def notescmd(self, message):
+        """List the saved notes"""
+        await utils.answer(message, self.strings["notes_header"]
+                           + "\n".join(self.strings["notes_item"].format(key)
+                           for key in self._db.get(__name__, "notes", {})))
 
     async def client_ready(self, client, db):
         self._db = db
