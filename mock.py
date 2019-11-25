@@ -27,10 +27,18 @@ def register(cb):
     cb(MockMod())
 
 
+@loader.tds
 class MockMod(loader.Module):
     """mOcKs PeOpLe"""
-    def __init__(self):
-        self.name = _("Mocker")
+    strings = {"name": "Memes",
+               "mock_args": "<b>rEpLy To A mEsSaGe To MoCk It (Or TyPe ThE mEsSaGe AfTeR tHe CoMmAnD)</b>",
+               "figlet_args": "<b>Supply a font and some text to render with figlet</b>",
+               "no_font": "<b>Font not found</b>",
+               "uwu_args": "<b>I nyeed some text fow the nyeko.</b>",
+               "shout_args": "<b>You can't shout nothing.</b>"}
+
+    def config_complete(self):
+        self.name = self.strings["name"]
 
     async def mockcmd(self, message):
         """Use in reply to another message or as .mock <text>"""
@@ -39,7 +47,7 @@ class MockMod(loader.Module):
             if message.is_reply:
                 text = (await message.get_reply_message()).message
             else:
-                await message.edit(_("rEpLy To A mEsSaGe To MoCk It (Or TyPe ThE mEsSaGe AfTeR tHe CoMmAnD)"))
+                await utils.answer(message, self.strings["mock_args"])
                 return
         text = list(text)
         n = 0
@@ -61,7 +69,7 @@ class MockMod(loader.Module):
         # We can't localise figlet due to a lack of fonts
         args = utils.get_args(message)
         if len(args) < 2:
-            await utils.answer(message, "<code>Supply a font and some text to render with figlet</code>")
+            await utils.answer(message, self.strings["figlet_args"])
             return
         text = " ".join(args[1:])
         mode = args[0]
@@ -70,18 +78,18 @@ class MockMod(loader.Module):
         try:
             fig = Figlet(font=mode, width=30)
         except FontNotFound:
-            await message.edit(_("<code>Font not found</code>"))
+            await utils.answer(message, self.strings["no_font"])
             return
         await message.edit("<code>\u206a" + utils.escape_html(fig.renderText(text)) + "</code>")
 
     async def uwucmd(self, message):
         """Use in wepwy to anyothew message ow as .uwu <text>"""
         text = utils.get_args_raw(message.message)
-        if len(text) == 0:
+        if not text:
             if message.is_reply:
                 text = (await message.get_reply_message()).message
             else:
-                await message.edit(_("<code>I nyeed some text fow the nyeko.</code>"))
+                await utils.answer(message, self.strings["uwu_args"])
                 return
         reply_text = re.sub(r"(r|l)", "w", text)
         reply_text = re.sub(r"(R|L)", "W", reply_text)
@@ -91,10 +99,13 @@ class MockMod(loader.Module):
         await message.edit(reply_text)
 
     async def shoutcmd(self, message):
-        """.shoutout <text> makes the text massive"""
+        """.shout <text> makes the text massive"""
         text = utils.get_args_raw(message)
         if not text:
-            await message.edit(_("You can't shout nothing."))
-            return
+            if message.is_reply:
+                text = (await message.get_reply_message()).message
+            else:
+                await utils.answer(message, self.strings["shout_args"])
+                return
         result = " ".join(text) + "\n" + "\n".join(sym + " " * (pos * 2 + 1) + sym for pos, sym in enumerate(text[1:]))
         await utils.answer(message, "<code>" + utils.escape_html(result) + "</code>")
