@@ -39,7 +39,10 @@ class NotesMod(loader.Module):
                "notes_header": "<b>Saved notes:</b>\n\n",
                "notes_item": "<b>•</b> <code>{}</code>",
                "delnote_args": "<b>What note should be deleted?</b>",
-               "delnote_done": "<b>Note deleted</b>"}
+               "delnote_done": "<b>Note deleted</b>",
+               "delnotes_none": "<b>There are no notes to be cleared</b>",
+               "delnotes_done": "<b>All notes cleared</b>",
+               "notes_none": "<b>There are no saved notes</b>"}
 
     def config_complete(self):
         self.name = self.strings["name"]
@@ -56,6 +59,14 @@ class NotesMod(loader.Module):
             await utils.answer(message, self.strings["no_note"])
             return
         await utils.answer(message, await self._db.fetch_asset(asset_id))
+
+    async def delallnotescmd(self, message):
+        """Deletes all the saved notes"""
+        if not self._db.get(__name__, "notes", {}):
+            await utils.answer(message, self.strings["delnotes_none"])
+            return
+        self._db.get(__name__, "notes", {}).clear()
+        await utils.answer(message, self.strings["delnotes_done"])
 
     async def savecmd(self, message):
         """Save a new note. Must be used in reply with one parameter (note name)"""
@@ -90,9 +101,21 @@ class NotesMod(loader.Module):
 
     async def notescmd(self, message):
         """List the saved notes"""
+        if not self._db.get(__name__, "notes", {}):
+            await utils.answer(message, self.strings["notes_none"])
+            return
         await utils.answer(message, self.strings["notes_header"]
                            + "\n".join(self.strings["notes_item"].format(key)
                            for key in self._db.get(__name__, "notes", {})))
+
+    async def watcher(self, message):
+        args = message.text
+        notes = self._db.get(__name__, "notes", {})
+        if args.startswith("#"):
+            for key in notes:
+                if args[1:] in notes:
+                    value = await self._db.fetch_asset(notes[key])
+            await utils.answer(message, value)
 
     async def client_ready(self, client, db):
         self._db = db
