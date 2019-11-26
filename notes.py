@@ -108,14 +108,5 @@ class NotesMod(loader.Module):
                            + "\n".join(self.strings["notes_item"].format(key)
                            for key in self._db.get(__name__, "notes", {})))
 
-    async def watcher(self, message):
-        args = message.text
-        notes = self._db.get(__name__, "notes", {})
-        if args.startswith("#"):
-            for key in notes:
-                if args[1:] in notes:
-                    value = await self._db.fetch_asset(notes[key])
-            await utils.answer(message, value)
-
     async def client_ready(self, client, db):
         self._db = db
