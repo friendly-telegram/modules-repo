@@ -14,8 +14,9 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from .. import loader
+from .. import loader, utils
 import logging
+import telethon
 
 logger = logging.getLogger(__name__)
 
@@ -24,22 +25,39 @@ def register(cb):
     cb(PurgeMod())
 
 
+@loader.tds
 class PurgeMod(loader.Module):
     """Deletes your messages"""
-    def __init__(self):
-        self.name = _("Purge")
+    strings = {"name": "Purge",
+               "from_where": "From where shall I purge?"}
+
+    def config_complete(self):
+        self.name = self.strings["name"]
 
     async def purgecmd(self, message):
         """Purge from the replied message"""
         if not message.is_reply:
-            await message.edit(_("From where shall I purge?"))
+            await message.edit(self.strings["from_where"])
             return
+
+        from_users = set()
+        args = utils.get_args(message)
+        for arg in args:
+            try:
+                entity = await message.client.get_entity(arg)
+                if isinstance(entity, telethon.tl.types.User):
+                    from_users.add(entity.id)
+            except ValueError:
+                pass
+
         msgs = []
         from_ids = set()
         async for msg in message.client.iter_messages(
                 entity=message.to_id,
                 min_id=message.reply_to_msg_id - 1,
                 reverse=True):
+            if from_users and msg.from_id not in from_users:
+                continue
             msgs.append(msg.id)
             from_ids.add(msg.from_id)
             if len(msgs) >= 99:
