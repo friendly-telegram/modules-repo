@@ -35,7 +35,7 @@ class SpamMod(loader.Module):
                "much_spam": "<b>Haha, much spam.</b>"}
 
     def __init__(self):
-        self.name = _("Spammer")
+        self.name = self.strings["name"]
 
     async def spamcmd(self, message):
         """.spam <count> <message>"""
