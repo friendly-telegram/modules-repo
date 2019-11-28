@@ -25,10 +25,10 @@ logger = logging.getLogger(__name__)
 
 
 def register(cb):
-    cb(YourMod())
+    cb(SpeedtestMod())
 
 
-class YourMod(loader.Module):
+class SpeedtestMod(loader.Module):
     """Uses speedtest.net"""
     def __init__(self):
         self.name = _("Speedtest")
