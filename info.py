@@ -33,6 +33,7 @@ def register(cb):
     cb(InfoMod())
 
 
+@loader.tds
 class InfoMod(loader.Module):
     """Provides system information about the computer hosting this bot"""
     strings = {"name": "System Info",
