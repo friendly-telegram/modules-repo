@@ -35,15 +35,28 @@ def register(cb):
 
 class InfoMod(loader.Module):
     """Provides system information about the computer hosting this bot"""
+    strings = {"name": "System Info",
+               "info_title": "<b>System Info</b>",
+               "kernel": "<b>Kernel:</b> <code>{}</code>",
+               "arch": "<b>Arch:</b> <code>{}</code>",
+               "os": "<b>OS:</b <code>{}</code>",
+               "distro": "<b>Linux Distribution:</b> <code>{}</code>",
+               "android_sdk": "<b>Android SDK:</b> <code>{}</code>",
+               "android_ver": "<b>Android Version:</b> <code>{}</code>",
+               "android_patch": "<b>Android Security Patch:</b> <code>{}</code>",
+               "unknown_distro": "<b>Could not determine Linux distribution.</b>",
+               "python_version": "<b>Python version:</b> <code>{}</code>",
+               "telethon_version": "<b>Telethon version:</b> <code>{}</code>"}
+
     def __init__(self):
-        self.name = _("Info")
+        self.name = self.strings["name"]
 
     async def infocmd(self, message):
         """Shows system information"""
-        reply = "<code>" + _("System Info")
-        reply += "\n" + _("Kernel: {}").format(utils.escape_html(platform.release()))
-        reply += "\n" + _("Arch: {}").format(utils.escape_html(platform.architecture()[0]))
-        reply += "\n" + _("OS: {}").format(utils.escape_html(platform.system()))
+        reply = self.strings["info_title"]
+        reply += "\n" + self.strings["kernel"].format(utils.escape_html(platform.release()))
+        reply += "\n" + self.strings["arch"].format(utils.escape_html(platform.architecture()[0]))
+        reply += "\n" + self.strings["os"].format(utils.escape_html(platform.system()))
 
         if platform.system() == "Linux":
             done = False
@@ -52,7 +65,7 @@ class InfoMod(loader.Module):
                 b = {}
                 for line in a:
                     b[line.split("=")[0]] = line.split("=")[1].strip().strip("\"")
-                reply += "\n" + _("Linux Distribution: {}").format(utils.escape_html(b["PRETTY_NAME"]))
+                reply += "\n" + self.strings["distro"].format(utils.escape_html(b["PRETTY_NAME"]))
                 done = True
             except FileNotFoundError:
                 getprop = shutil.which("getprop")
@@ -67,14 +80,12 @@ class InfoMod(loader.Module):
                     vers, unused = await ver.communicate()
                     secs, unused = await sec.communicate()
                     if sdk.returncode == 0 and ver.returncode == 0 and sec.returncode == 0:
-                        reply += "\n" + _("Android SDK: {}").format(sdks.decode("utf-8").strip())
-                        reply += "\n" + _("Android Version: {}").format(vers.decode("utf-8").strip())
-                        reply += "\n" + _("Android Security Patch: {}").format(secs.decode("utf-8").strip())
+                        reply += "\n" + self.strings["android_sdk"].format(sdks.decode("utf-8").strip())
+                        reply += "\n" + self.strings["android_ver"].format(vers.decode("utf-8").strip())
+                        reply += "\n" + self.strings["android_patch"].format(secs.decode("utf-8").strip())
                         done = True
             if not done:
-                reply += "\n" + _("Could not determine Linux distribution")
-        reply += "\n" + _("Python version: {}").format(utils.escape_html(sys.version))
-        reply += "\n" + _("Telethon Version: {}").format(utils.escape_html(telethon.__version__))
-        reply += "</code>"
-        logger.debug(reply)
-        await message.edit(reply)
+                reply += "\n" + self.strings["unknown_distro"]
+        reply += "\n" + self.strings["python_version"].format(utils.escape_html(sys.version))
+        reply += "\n" + self.strings["telethon_version"].format(utils.escape_html(telethon.__version__))
+        await utils.answer(message, reply)
