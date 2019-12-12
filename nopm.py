@@ -55,11 +55,13 @@ class AntiPMMod(loader.Module):
                              "Did you even ask me for approving you to PM? No? Goodbye then."
                              "\n\nPS: you've been reported as spam already.")}
 
-    def config_complete(self):
-        self.name = self.strings["name"]
+    def __init__(self):
         self.config = loader.ModuleConfig("PM_BLOCK_LIMIT", None, lambda: self.strings["limit_cfg_doc"])
         self._me = None
         self._ratelimit = []
+
+    def config_complete(self):
+        self.name = self.strings["name"]
 
     async def client_ready(self, client, db):
         self._db = db

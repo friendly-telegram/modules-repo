@@ -25,11 +25,18 @@ def register(cb):
     cb(BEmojiMod())
 
 
+@loader.tds
 class BEmojiMod(loader.Module):
     """🅱️-ifies things"""
+    strings = {"name": "🅱️",
+               "replacable_chars_cfg_doc": "Characters that can be replaced with 🅱️",
+               "no_text": "<b>There's nothing to 🅱️-ify</b>"}
+
     def __init__(self):
         self.config = loader.ModuleConfig("REPLACABLE_CHARS", "bdfgpv", "Characters that can be replaced with 🅱️")
-        self.name = _("🅱️")
+
+    def config_complete(self):
+        self.name = self.strings["name"]
 
     async def bcmd(self, message):
         """Use in reply to another message or as .b <text>"""
@@ -38,7 +45,7 @@ class BEmojiMod(loader.Module):
         else:
             text = utils.get_args_raw(message.message)
         if text is None or len(text) == 0:
-            await message.edit(_("<code>There's nothing to 🅱️-ify</code>"))
+            await message.edit(self.strings["no_text"])
             return
         text = list(text)
         n = 0

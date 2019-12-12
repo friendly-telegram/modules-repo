@@ -26,6 +26,7 @@ def register(cb):
     cb(SpamMod())
 
 
+@loader.tds
 class SpamMod(loader.Module):
     """Annoys people really effectively"""
     strings = {"name": "Spam",
