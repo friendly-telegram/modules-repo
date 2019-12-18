@@ -1,12 +1,7 @@
 admin_tools
 afk
-google
 info
-insult
-lmgtfy
 lydia
-lyrics
-misc
 nopm
 notes
 purge
@@ -14,9 +9,7 @@ recentactions
 speedtest
 stickers
 terminal
-transfersh
 translate
 typer
-urbandictionary
 userinfo
 weather
