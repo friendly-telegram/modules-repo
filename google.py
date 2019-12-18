@@ -29,37 +29,35 @@ def register(cb):
     cb(GoogleSearchMod())
 
 
+@loader.tds
 class GoogleSearchMod(loader.Module):
     """Make a Google search, right in your chat!"""
-    def __init__(self):
-        self.name = _("Search Engine")
+    strings = {"name": "Google Search",
+               "no_term": "<b>I can't Google nothing</b>",
+               "no_results": "<b>Could not find anything about</b> <code>{}</code> <b>on Google</b>",
+               "results": "<b>These came back from a Google search for</b> <code>{}</code>:\n\n",
+               "result": "<a href='{}'>{}</a>\n\n<code>{}</code>\n"}
+
+    def config_complete(self):
+        self.name = self.strings["name"]
 
     async def googlecmd(self, message):
         """Shows Google search results."""
-        if len(utils.get_args_raw(message)) == 0:
+        text = utils.get_args_raw(message.message)
+        if not text:
             text = (await message.get_reply_message()).message
-        else:
-            text = utils.get_args_raw(message.message)
-        if len(text) == 0:
-            await message.edit(_("Unfortunately, I can't Google nothing."))
+        if not text:
+            await utils.answer(message, self.strings["no_term"])
             return
         # TODO: add ability to specify page number.
-        search_args = (str(text), 1)
         gsearch = GoogleSearch()
-        gresults = await gsearch.async_search(*search_args)
-        msg = ""
-        for i in range(len(gresults["titles"])):
-            try:
-                title = gresults["titles"][i]
-                link = gresults["links"][i]
-                desc = gresults["descriptions"][i]
-                msg += f"<p><a href='{link}'>{title}</a></p>\
-                \n<code>{desc}</code>\n\n"
-            except IndexError:
-                break
-        if msg == "":
-            await utils.answer(message, _(f"Could not find anything about <code>{text}</code> on Google."))
+        gresults = await gsearch.async_search(text, 1)
+        if not gresults:
+            await utils.answer(message, self.strings["no_results"].format(text))
             return
-        else:
-            await utils.answer(message, _(f"These came back from a Google search for <code>{text}</code>:\
-            \n\n{msg}"))
+        msg = ""
+        results = zip(gresults["titles"], gresults["links"], gresults["descriptions"])
+        for result in results:
+            msg += self.strings["result"].format(utils.escape_html(result[0]), utils.escape_html(result[1]),
+                                                 utils.escape_html(result[2]))
+        await utils.answer(message, self.strings["results"].format(utils.escape_html(text)) + msg)
