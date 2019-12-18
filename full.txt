@@ -29,3 +29,4 @@ userinfo
 weather
 xda
 yesno
+quotes
