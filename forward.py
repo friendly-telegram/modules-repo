@@ -27,15 +27,23 @@ def register(cb):
     cb(ForwardMod())
 
 
+@loader.tds
 class ForwardMod(loader.Module):
     """Forwards messages"""
-    def __init__(self):
-        self.name = _("Forwarding")
+    strings = {"name": "Forwarding",
+               "error": "<b>Invalid chat to forward to</b>",
+               "done": "<b>Forwarded all messages</b>"}
+
+    def config_complete(self):
+        self.name = self.strings["name"]
 
     async def fwdallcmd(self, message):
         """.fwdall <to_user>
            Forwards all messages in chat"""
-        user = utils.get_args(message)[0]
+        try:
+            user = message.client.get_input_entity(utils.get_args(message)[0])
+        except ValueError:
+            await utils.answer(self.strings["error"])
         msgs = []
         async for msg in message.client.iter_messages(
                 entity=message.to_id,
@@ -45,7 +53,7 @@ class ForwardMod(loader.Module):
                 logger.debug(msgs)
                 await message.client.forward_messages(user, msgs, message.from_id)
                 msgs = []
-            # No async list comprehension in 3.5
         if len(msgs) > 0:
             logger.debug(msgs)
             await message.client.forward_messages(user, msgs, message.from_id)
+        await utils.answer(message, self.strings["done"])
