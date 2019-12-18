@@ -154,10 +154,8 @@ class StickersMod(loader.Module):
             else:
                 try:
                     thumb = BytesIO()
-                    await utils.run_sync(resize_image, img, self.config["STICKER_SIZE"], thumb)
-                    img.close()
+                    task = asyncio.ensure_future(utils.run_sync(resize_image, img, self.config["STICKER_SIZE"], thumb))
                     thumb.name = "sticker.png"
-                    thumb.seek(0)
                     # The data is now in thumb.
                     # Lock access to @Stickers
                     async with self._lock:
@@ -218,6 +216,8 @@ class StickersMod(loader.Module):
                                 await message.client.delete_messages("t.me/" + self.config["STICKERS_USERNAME"],
                                                                      msgs + [first])
                                 return
+                            await task  # We can resize the thumbnail while the sticker bot is processing other data
+                            thumb.seek(0)
                             m1 = await conv.send_file(thumb, allow_cache=False, force_document=True)
                             r1 = await conv.get_response(m1)
                             m2 = await conv.send_message(emojis)
@@ -333,4 +333,6 @@ def resize_image(img, size, dest):
         logger.debug("Resizing to %s", size)
         im.resize(size).save(dest, "PNG")
     finally:
+        im.close()
+        img.close()
         del im
