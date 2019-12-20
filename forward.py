@@ -41,7 +41,7 @@ class ForwardMod(loader.Module):
         """.fwdall <to_user>
            Forwards all messages in chat"""
         try:
-            user = message.client.get_input_entity(utils.get_args(message)[0])
+            user = await message.client.get_input_entity(utils.get_args(message)[0])
         except ValueError:
             await utils.answer(self.strings["error"])
         msgs = []
