@@ -1,8 +1,6 @@
 admin_tools
 afk
 info
-lydia
-nopm
 notes
 purge
 recentactions
