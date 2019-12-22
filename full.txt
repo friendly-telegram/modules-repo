@@ -15,6 +15,7 @@ nopm
 notes
 purge
 quicktype
+quotes
 recentactions
 spam
 speedtest
