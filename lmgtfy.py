@@ -32,21 +32,20 @@ def register(cb):
 class LetMeGoogleThatForYou(loader.Module):
     """Let me Google that for you, coz you too lazy to do that yourself."""
     strings = {"name": "LetMeGoogleThatForYou",
-               "no_query": "<b>I need something to Google for the lazy guy(s) here.</b>",
-               "result": "<b>Here you go, help yourself.</b>\n<a href='{}'>{}</a>"}
+               "result": "<b>Here you go, help yourself.</b>\n<a href='{}'>{}</a>",
+               "default": "How to use Google?"}
 
     def __init__(self):
         self.name = self.strings["name"]
 
     async def lmgtfycmd(self, message):
         """Use in reply to another message or as .lmgtfy <text>"""
-        if len(utils.get_args_raw(message)) == 0:
-            text = (await message.get_reply_message()).message
-        else:
-            text = utils.get_args_raw(message.message)
-        if len(text) == 0:
-            await utils.answer(message, self.strings["no_query"])
-            return
+        text = utils.get_args_raw(message)
+        if not text:
+            if message.is_reply:
+                text = (await message.get_reply_message()).message
+            else:
+                text = self.strings["default"]
         query_encoded = urllib.parse.quote_plus(text)
         lmgtfy_url = f"http://lmgtfy.com/?s=g&iie=1&q={query_encoded}"
         payload = {"format": "json", "url": lmgtfy_url}
