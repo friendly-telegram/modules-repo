@@ -62,10 +62,10 @@ class LydiaMod(loader.Module):
             if not session["expires"] < t:
                 nsessions.update({ident: session})
             else:
+                break  # workaround server bug
                 session = await utils.run_sync(self._lydia.get_session, session["session_id"])
                 if session.available:
                     nsessions.update({ident: session})
-                pass
         if len(nsessions) > 1:
             next = min(*[v["expires"] for k, v in nsessions.items()])
         elif len(nsessions) == 1:
