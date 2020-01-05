@@ -19,9 +19,9 @@
 from .. import loader, utils
 import logging
 
-from telethon.tl.types import ChatBannedRights, PeerUser, PeerChannel
+from telethon.tl.types import ChatAdminRights, ChatBannedRights, PeerUser, PeerChannel
 from telethon.errors import BadRequestError
-from telethon.tl.functions.channels import EditBannedRequest
+from telethon.tl.functions.channels import EditAdminRequest, EditBannedRequest
 
 logger = logging.getLogger(__name__)
 
@@ -40,11 +40,15 @@ class BanMod(loader.Module):
                "ban_none": "<b>I can't ban no-one, can I?</b>",
                "unban_none": "<b>I need someone to unbanned here.</b>",
                "kick_none": "<b>I need someone to be kicked out of the chat.</b>",
+               "promote_none": "<b>I can't promote no one, can I?</b>",
+               "demote_none": "<b>I can't demote no one, can I?</b>",
                "who": "<b>Who the hell is that?</b>",
                "not_admin": "<b>Am I an admin here?</b>",
                "banned": "<b>Banned</b> <code>{}</code> <b>from the chat!</b>",
                "unbanned": "<b>Unbanned</b> <code>{}</code> <b>from the chat!</b>",
-               "kicked": "<b>Kicked</b> <code>{}</code> <b>from the chat!</b>"}
+               "kicked": "<b>Kicked</b> <code>{}</code> <b>from the chat!</b>",
+               "promoted": "<code>{}</code> <b>is now powered with admin rights!</b>",
+               "demoted": "<code>{}</code> <b>is now stripped off of their admin rights!</b>"}
 
     def __init__(self):
         self.name = self.strings["name"]
@@ -116,6 +120,62 @@ class BanMod(loader.Module):
         else:
             await self.allmodules.log("kick", group=message.chat_id, affected_uids=[user.id])
             await utils.answer(message, self.strings["kicked"].format(utils.escape_html(ascii(user.first_name))))
+
+    async def promotecmd(self, message):
+        """Provides admin rights to the specified user."""
+        if message.is_reply:
+            user = await utils.get_user(await message.get_reply_message())
+        else:
+            args = utils.get_args(message)
+            if len(args) == 0:
+                return await utils.answer(message, self.strings["promote_none"])
+            user = await self.client.get_entity(args[0])
+        if not user:
+            return await utils.answer(message, self.strings["who"])
+        logger.debug(user)
+        try:
+            await self.client(EditAdminRequest(message.chat_id, user.id,
+                              ChatAdminRights(post_messages=None,
+                                              add_admins=None,
+                                              invite_users=None,
+                                              change_info=None,
+                                              ban_users=None,
+                                              delete_messages=True,
+                                              pin_messages=True,
+                                              edit_messages=None), "Admin"))
+        except BadRequestError:
+            await utils.answer(message, self.strings["not_admin"])
+        else:
+            await self.allmodules.log("promote", group=message.chat_id, affected_uids=[user.id])
+            await utils.answer(message, self.strings["promoted"].format(utils.escape_html(ascii(user.first_name))))
+
+    async def demotecmd(self, message):
+        """Removes admin rights of the specified group admin."""
+        if message.is_reply:
+            user = await utils.get_user(await message.get_reply_message())
+        else:
+            args = utils.get_args(message)
+            if len(args) == 0:
+                return await utils.answer(message, self.strings["demote_none"])
+            user = await self.client.get_entity(args[0])
+        if not user:
+            return await utils.answer(message, self.strings["who"])
+        logger.debug(user)
+        try:
+            await self.client(EditAdminRequest(message.chat_id, user.id,
+                              ChatAdminRights(post_messages=None,
+                                              add_admins=None,
+                                              invite_users=None,
+                                              change_info=None,
+                                              ban_users=None,
+                                              delete_messages=None,
+                                              pin_messages=None,
+                                              edit_messages=None), "Admin"))
+        except BadRequestError:
+            await utils.answer(message, self.strings["not_admin"])
+        else:
+            await self.allmodules.log("demote", group=message.chat_id, affected_uids=[user.id])
+            await utils.answer(message, self.strings["demoted"].format(utils.escape_html(ascii(user.first_name))))
 
     async def client_ready(self, client, db):
         self.client = client
