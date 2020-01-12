@@ -90,18 +90,10 @@ class QuotesMod(loader.Module):
         profile_photo_url = reply.from_id
 
         admintitle = ""
-        if isinstance(message.to_id, telethon.tl.types.PeerChannel):
-            try:
-                user = await self.client(telethon.tl.functions.channels.GetParticipantRequest(message.chat_id,
-                                                                                              reply.from_id))
-                if isinstance(user.participant, telethon.tl.types.ChannelParticipantCreator):
-                    admintitle = user.participant.rank or self.strings["creator"]
-                elif isinstance(user.participant, telethon.tl.types.ChannelParticipantAdmin):
-                    admintitle = user.participant.rank or self.strings["admin"]
-                user = user.users[0]
-            except telethon.errors.rpcerrorlist.UserNotParticipantError:
-                user = await reply.get_sender()
-        elif isinstance(message.to_id, telethon.tl.types.PeerChat):
+        pfp = None
+        if isinstance(reply.to_id, telethon.tl.types.PeerChannel) and reply.fwd_from:
+            user = reply.forward.chat
+        elif isinstance(reply.to_id, telethon.tl.types.PeerChat):
             chat = await self.client(telethon.tl.functions.messages.GetFullChatRequest(reply.to_id))
             participants = chat.full_chat.participants.participants
             participant = next(filter(lambda x: x.user_id == reply.from_id, participants), None)
@@ -114,23 +106,44 @@ class QuotesMod(loader.Module):
             user = await reply.get_sender()
 
         username = telethon.utils.get_display_name(user)
+        if hasattr(reply.fwd_from, "post_author"):
+            username += f" ({reply.fwd_from.post_author})"
         user_id = reply.from_id
 
         if reply.fwd_from:
             if reply.fwd_from.saved_from_peer:
-                username = telethon.utils.get_display_name(reply.forward.chat)
                 profile_photo_url = reply.forward.chat
                 admintitle = self.strings["channel"]
             elif reply.fwd_from.from_name:
                 username = reply.fwd_from.from_name
+                profile_photo_url = None
+                admintitle = ""
             elif reply.forward.sender:
                 username = telethon.utils.get_display_name(reply.forward.sender)
+                profile_photo_url = reply.forward.sender.id
+                admintitle = ""
             elif reply.forward.chat:
-                username = telethon.utils.get_display_name(reply.forward.chat)
+                admintitle = self.strings["channel"]
+                profile_photo_url = user
+        else:
+            if isinstance(reply.to_id, telethon.tl.types.PeerUser) is False:
+                try:
+                    user = await self.client(telethon.tl.functions.channels.GetParticipantRequest(message.chat_id,
+                                                                                                  user))
+                    if isinstance(user.participant, telethon.tl.types.ChannelParticipantCreator):
+                        admintitle = user.participant.rank or self.strings["creator"]
+                    elif isinstance(user.participant, telethon.tl.types.ChannelParticipantAdmin):
+                        admintitle = user.participant.rank or self.strings["admin"]
+                    user = user.users[0]
+                except telethon.errors.rpcerrorlist.UserNotParticipantError:
+                    pass
+        if profile_photo_url is not None:
+            pfp = await self.client.download_profile_photo(profile_photo_url, bytes)
 
-        pfp = await self.client.download_profile_photo(profile_photo_url, bytes)
         if pfp is not None:
             profile_photo_url = "data:image/png;base64, " + base64.b64encode(pfp).decode()
+        else:
+            profile_photo_url = ""
 
         if user_id is not None:
             username_color = self.config["username_colors"][user_id % 7]
