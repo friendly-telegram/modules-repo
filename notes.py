@@ -34,7 +34,7 @@ class NotesMod(loader.Module):
                "what_note": "<b>What note should be retrieved?</b>",
                "no_note": "<b>Note not found</b>",
                "save_what": "<b>You must reply to a message to save it to a note, or type the note.</b>",
-               "what_name": "<b>You must specify what the note should be called?",
+               "what_name": "<b>You must specify what the note should be called?</b>",
                "saved": "<b>Note saved</b>",
                "notes_header": "<b>Saved notes:</b>\n\n",
                "notes_item": "<b>•</b> <code>{}</code>",
