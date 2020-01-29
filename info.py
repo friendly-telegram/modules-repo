@@ -40,7 +40,7 @@ class InfoMod(loader.Module):
                "info_title": "<b>System Info</b>",
                "kernel": "<b>Kernel:</b> <code>{}</code>",
                "arch": "<b>Arch:</b> <code>{}</code>",
-               "os": "<b>OS:</b <code>{}</code>",
+               "os": "<b>OS:</b> <code>{}</code>",
                "distro": "<b>Linux Distribution:</b> <code>{}</code>",
                "android_sdk": "<b>Android SDK:</b> <code>{}</code>",
                "android_ver": "<b>Android Version:</b> <code>{}</code>",
