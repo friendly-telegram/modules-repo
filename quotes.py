@@ -54,7 +54,8 @@ class QuotesMod(loader.Module):
         "admin": "admin",
         "creator": "creator",
         "hidden": "hidden",
-        "channel": "Channel"
+        "channel": "Channel",
+        "filename": "file.png"
     }
 
     def __init__(self):
@@ -83,9 +84,6 @@ class QuotesMod(loader.Module):
         if not reply:
             return await utils.answer(message, self.strings["no_reply"])
 
-        if not args:
-            return await utils.answer(message, self.strings["no_template"])
-
         username_color = username = admintitle = user_id = None
         profile_photo_url = reply.from_id
 
@@ -106,7 +104,7 @@ class QuotesMod(loader.Module):
             user = await reply.get_sender()
 
         username = telethon.utils.get_display_name(user)
-        if hasattr(reply.fwd_from, "post_author"):
+        if reply.fwd_from is not None and reply.fwd_from.post_author is not None:
             username += f" ({reply.fwd_from.post_author})"
         user_id = reply.from_id
 
@@ -150,6 +148,31 @@ class QuotesMod(loader.Module):
         else:
             username_color = self.config["default_username_color"]
 
+        reply_username = ""
+        reply_text = ""
+        if reply.is_reply is True:
+            reply_to = await reply.get_reply_message()
+            reply_peer = None
+            if reply_to.fwd_from is not None:
+                if reply_to.forward.chat is not None:
+                    reply_peer = reply_to.forward.chat
+                elif reply_to.fwd_from.from_id is not None:
+                    try:
+                        user_id = reply_to.fwd_from.from_id
+                        user = await self.client(telethon.tl.functions.users.GetFullUserRequest(user_id))
+                        reply_peer = user.user
+                    except ValueError:
+                        pass
+                else:
+                    reply_username = reply_to.fwd_from.from_name
+            elif reply_to.from_id is not None:
+                reply_user = await self.client(telethon.tl.functions.users.GetFullUserRequest(reply_to.from_id))
+                reply_peer = reply_user.user
+
+            if reply_username is None or reply_username == "":
+                reply_username = telethon.utils.get_display_name(reply_peer)
+            reply_text = reply_to.message
+
         request = json.dumps({
             "ProfilePhotoURL": profile_photo_url,
             "usernameColor": username_color,
@@ -157,7 +180,9 @@ class QuotesMod(loader.Module):
             "adminTitle": admintitle,
             "Text": reply.message,
             "Markdown": get_markdown(reply),
-            "Template": args[0],
+            "ReplyUsername": reply_username,
+            "ReplyText": reply_text,
+            "Template": args[0] if len(args) > 0 else "default",
             "APIKey": self.config["api_token"]
         })
 
@@ -203,16 +228,23 @@ class QuotesMod(loader.Module):
         file = BytesIO(req.content)
         file.seek(0)
 
-        img = await utils.run_sync(Image.open, file)
-        with BytesIO() as sticker:
-            await utils.run_sync(img.save, sticker, "webp")
-            sticker.name = "sticker.webp"
-            sticker.seek(0)
-            try:
-                await utils.answer(message, sticker)
-            except telethon.errors.rpcerrorlist.ChatSendStickersForbiddenError:
-                await utils.answer(message, self.strings["cannot_send_stickers"])
-            file.close()
+        if len(args) == 2:
+            if args[1] == "file":
+                await utils.answer(message, file)
+            elif args[1] == "force_file":
+                file.name = self.strings["filename"]
+                await utils.answer(message, file, force_document=True)
+        else:
+            img = await utils.run_sync(Image.open, file)
+            with BytesIO() as sticker:
+                await utils.run_sync(img.save, sticker, "webp")
+                sticker.name = "sticker.webp"
+                sticker.seek(0)
+                try:
+                    await utils.answer(message, sticker)
+                except telethon.errors.rpcerrorlist.ChatSendStickersForbiddenError:
+                    await utils.answer(message, self.strings["cannot_send_stickers"])
+                file.close()
 
 
 def get_markdown(reply):
