@@ -235,7 +235,7 @@ class QuotesMod(loader.Module):
             elif args[1] == "force_file":
                 file.name = self.strings["filename"]
                 await utils.answer(message, file, force_document=True)
-        elif len(args) == 1:
+        else:
             img = await utils.run_sync(Image.open, file)
             with BytesIO() as sticker:
                 await utils.run_sync(img.save, sticker, "webp")
