@@ -76,8 +76,9 @@ class QuotesMod(loader.Module):
 
     async def quotecmd(self, message):  # noqa: C901
         """Quote a message.
-        Usage: .quote [template]
-        If template is missing, possible templates are fetched."""
+        Usage: .quote [template] [file/force_file]
+        If template is missing, possible templates are fetched.
+        If no args provided, default template will be used, quote sent as sticker"""
         args = utils.get_args(message)
         reply = await message.get_reply_message()
 
@@ -234,7 +235,7 @@ class QuotesMod(loader.Module):
             elif args[1] == "force_file":
                 file.name = self.strings["filename"]
                 await utils.answer(message, file, force_document=True)
-        else:
+        elif len(args) == 1:
             img = await utils.run_sync(Image.open, file)
             with BytesIO() as sticker:
                 await utils.run_sync(img.save, sticker, "webp")
