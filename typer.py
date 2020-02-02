@@ -28,17 +28,22 @@ def register(cb):
     cb(TyperMod())
 
 
+@loader.tds
 class TyperMod(loader.Module):
     """Makes your messages type slower"""
+    strings = {"name": "Typewriter",
+               "no_message": "<b>You can't type nothing!</b>",
+               "type_char_cfg_doc": "Character for typewriter"}
+
     def __init__(self):
-        self.config = loader.ModuleConfig("TYPE_CHAR", "▒", "Character for typewriter")
-        self.name = _("Typewriter")
+        self.config = loader.ModuleConfig("TYPE_CHAR", "▒", lambda: self.strings["type_char_cfg_doc"])
+        self.name = self.strings["name"]
 
     async def typecmd(self, message):
         """.type <message>"""
         a = utils.get_args_raw(message)
         if not a:
-            await utils.answer(message, _("<code>You can't type nothing!</code>"))
+            await utils.answer(message, self.strings["no_message"])
             return
         m = ""
         for c in a:
