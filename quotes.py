@@ -174,6 +174,12 @@ class QuotesMod(loader.Module):
                 reply_username = telethon.utils.get_display_name(reply_peer)
             reply_text = reply_to.message
 
+        date = ""
+        if reply.fwd_from is not None:
+            date = reply.fwd_from.date.strftime("%H:%M")
+        else:
+            date = reply.date.strftime("%H:%M")
+
         request = json.dumps({
             "ProfilePhotoURL": profile_photo_url,
             "usernameColor": username_color,
@@ -183,6 +189,7 @@ class QuotesMod(loader.Module):
             "Markdown": get_markdown(reply),
             "ReplyUsername": reply_username,
             "ReplyText": reply_text,
+            "Date": date,
             "Template": args[0] if len(args) > 0 else "default",
             "APIKey": self.config["api_token"]
         })
