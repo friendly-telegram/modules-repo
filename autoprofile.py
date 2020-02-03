@@ -36,51 +36,68 @@ def register(cb):
     cb(AutoProfileMod())
 
 
+@loader.tds
 class AutoProfileMod(loader.Module):
     """Automatic stuff for your profile :P"""
+    strings = {"name": "Automatic Profile",
+               "missing_pil": "<b>You don't have Pillow installed</b>",
+               "missing_pfp": "<b>You don't have a profile picture to rotate</b>",
+               "invalid_args": "<b>Missing parameters, please read the docs</b>",
+               "invalid_degrees": "<b>Invalid number of degrees to rotate, please read the docs</b>",
+               "invalid_delete": "<b>Please specify whether to delete the old pictures or not</b>",
+               "enabled_pfp": "<b>Enabled profile picture rotation</b>",
+               "pfp_not_enabled": "<b>Profile picture rotation is not enabled</b>",
+               "pfp_disabled": "<b>Profile picture rotation disabled</b>",
+               "missing_time": "<b>Time was not specified in bio</b>",
+               "enabled_bio": "<b>Enabled bio clock</b>",
+               "bio_not_enabled": "<b>Bio clock is not enabled</b>",
+               "disabled_bio": "<b>Disabled bio clock</b>",
+               "enabled_name": "<b>Enabled name clock</b>",
+               "name_not_enabled": "<b>Name clock is not enabled</b>",
+               "disabled_name": "<b>Name clock disabled</b>",
+               "how_many_pfps": "<b>Please specify how many profile pictures should be removed</b>",
+               "invalid_pfp_count": "<b>Invalid number of profile pictures to remove</b>",
+               "removed_pfps": "<b>Removed {} profile pic(s)</b>"}
+
     def __init__(self):
-        self.name = _("Automatic Profile")
         self.bio_enabled = False
         self.name_enabled = False
         self.pfp_enabled = False
         self.raw_bio = None
         self.raw_name = None
 
+    def config_complete(self):
+        self.name = self.strings["name"]
+
     async def client_ready(self, client, db):
         self.client = client
 
     async def autopfpcmd(self, message):
         """Rotates your profile picture every n seconds with x degrees, usage:
-           .autopfp <timeout> <degrees> <remove previous (last pfp)>
+           .autopfp <degrees> <remove previous (last pfp)>
 
-           Timeout - seconds
            Degrees - 60, -10, etc
-           Remove last pfp - True/False, case sensitive"""
+           Remove last pfp - True/1/False/0, case sensitive"""
 
         if not pil_installed:
-            return await utils.answer(message, _("<b>You don't have PIL (Pillow) installed.</b>"))
+            return await utils.answer(message, self.strings["missing_pil"])
 
         if not await self.client.get_profile_photos("me", limit=1):
-            return await utils.answer(message, _("<b>You don't have a profile pic set.</b>"))
+            return await utils.answer(message, self.strings["missing_pfp"])
 
         msg = utils.get_args(message)
-        if len(msg) != 3:
-            return await utils.answer(message, _("<b>Autopfp requires three args. See the help for syntax.</b>"))
+        if len(msg) != 2:
+            return await utils.answer(message, self.strings["invalid_args"])
 
         try:
-            timeout_autopfp = int(msg[0])
+            degrees = int(msg[0])
         except ValueError:
-            return await utils.answer(message, _("<b>Wrong time.</b>"))
+            return await utils.answer(message, self.strings["invalid_degrees"])
 
         try:
-            degrees = int(msg[1])
-        except ValueError:
-            return await utils.answer(message, _("<b>Wrong degrees value.</b>"))
-
-        try:
-            delete_previous = ast.literal_eval(msg[2])
+            delete_previous = ast.literal_eval(msg[1])
         except (ValueError, SyntaxError):
-            return await utils.answer(message, _("<b>Please pass True or False for previous pfp removal.</b>"))
+            return await utils.answer(message, self.strings["invalid_delete"])
 
         with BytesIO() as pfp:
             await self.client.download_profile_photo("me", file=pfp)
@@ -89,7 +106,7 @@ class AutoProfileMod(loader.Module):
             self.pfp_enabled = True
             pfp_degree = 0
             await self.allmodules.log("start_autopfp")
-            await utils.answer(message, "<b>Successfully enabled autopfp.</b>")
+            await utils.answer(message, self.strings["enabled_pfp"])
 
             while self.pfp_enabled:
                 pfp_degree = (pfp_degree + degrees) % 360
@@ -104,13 +121,13 @@ class AutoProfileMod(loader.Module):
 
                     await self.client(functions.photos.UploadProfilePhotoRequest(await self.client.upload_file(buf)))
                     buf.close()
-                await asyncio.sleep(timeout_autopfp)
+                await asyncio.sleep(60)
 
     async def stopautopfpcmd(self, message):
         """Stop autobio cmd."""
 
         if self.pfp_enabled is False:
-            return await utils.answer(message, _("<b>Autopfp is already disabled.</b>"))
+            return await utils.answer(message, self.strings["pfp_not_enabled"])
         else:
             self.pfp_enabled = False
 
@@ -118,28 +135,23 @@ class AutoProfileMod(loader.Module):
                 await self.client.get_profile_photos("me", limit=1)
             ))
             await self.allmodules.log("stop_autopfp")
-            await utils.answer(message, _("<b>Successfully disabled autobio, removing last profile pic.</b>"))
+            await utils.answer(message, self.strings["pfp_disabled"])
 
     async def autobiocmd(self, message):
         """Automatically changes your account's bio with current time, usage:
-            .autobio <timeout, seconds> '<message, time as {time}>'"""
+            .autobio '<message, time as {time}>'"""
 
         msg = utils.get_args(message)
-        if len(msg) != 2:
-            return await utils.answer(message, _("<b>AutoBio requires two args.</b>"))
-        else:
-            raw_bio = msg[1]
-            try:
-                timeout_autobio = int(msg[0])
-            except ValueError:
-                return await utils.answer(message, _("<b>Wrong time.</b>"))
+        if len(msg) != 1:
+            return await utils.answer(message, self.strings["invalid_args"])
+        raw_bio = msg[0]
         if "{time}" not in raw_bio:
-            return await utils.answer(message, _("<b>You haven't specified time position/Wrong format.</b>"))
+            return await utils.answer(message, self.strings["missing_time"])
 
         self.bio_enabled = True
         self.raw_bio = raw_bio
         await self.allmodules.log("start_autobio")
-        await utils.answer(message, _("<b>Successfully enabled autobio.</b>"))
+        await utils.answer(message, self.strings["enabled_bio"])
 
         while self.bio_enabled is True:
             current_time = time.strftime("%H:%M")
@@ -147,41 +159,34 @@ class AutoProfileMod(loader.Module):
             await self.client(functions.account.UpdateProfileRequest(
                 about=bio
             ))
-            await asyncio.sleep(timeout_autobio)
+            await asyncio.sleep(60)
 
     async def stopautobiocmd(self, message):
         """Stop autobio cmd."""
 
         if self.bio_enabled is False:
-            return await utils.answer(message, _("<b>Autobio is already disabled.</b>"))
+            return await utils.answer(message, self.strings["bio_not_enabled"])
         else:
             self.bio_enabled = False
             await self.allmodules.log("stop_autobio")
-            await utils.answer(message, _("<b>Successfully disabled autobio, setting bio to without time.</b>"))
-            await self.client(functions.account.UpdateProfileRequest(
-                about=self.raw_bio.format(time="")
-            ))
+            await utils.answer(message, self.strings["disabled_bio"])
+            await self.client(functions.account.UpdateProfileRequest(about=self.raw_bio.format(time="")))
 
     async def autonamecmd(self, message):
         """Automatically changes your Telegram name with current time, usage:
-            .autoname <timeout, seconds> '<message, time as {time}>'"""
+            .autoname '<message, time as {time}>'"""
 
         msg = utils.get_args(message)
-        if len(msg) != 2:
-            return await utils.answer(message, _("<b>AutoName requires two args.</b>"))
-        else:
-            raw_name = msg[1]
-            try:
-                timeout_autoname = int(msg[0])
-            except ValueError:
-                return await utils.answer(message, _("<b>Wrong time.</b>"))
+        if len(msg) != 1:
+            return await utils.answer(message, self.strings["invalid_args"])
+        raw_name = msg[0]
         if "{time}" not in raw_name:
-            return await utils.answer(message, _("<b>You haven't specified time position/Wrong format.</b>"))
+            return await utils.answer(message, self.strings["missing_time"])
 
         self.name_enabled = True
         self.raw_name = raw_name
         await self.allmodules.log("start_autoname")
-        await utils.answer(message, _("<b>Successfully enabled autoname.</b>"))
+        await utils.answer(message, self.strings["enabled_name"])
 
         while self.name_enabled is True:
             current_time = time.strftime("%H:%M")
@@ -189,17 +194,17 @@ class AutoProfileMod(loader.Module):
             await self.client(functions.account.UpdateProfileRequest(
                 first_name=name
             ))
-            await asyncio.sleep(timeout_autoname)
+            await asyncio.sleep(60)
 
     async def stopautonamecmd(self, message):
         """ Stop autoname cmd."""
 
         if self.name_enabled is False:
-            return await utils.answer(message, _("<b>Autoname is already disabled.</b>"))
+            return await utils.answer(message, self.strings["name_not_enabled"])
         else:
             self.name_enabled = False
             await self.allmodules.log("stop_autoname")
-            await utils.answer(message, _("<b>Successfully disabled autoname, setting name to without time.</b>"))
+            await utils.answer(message, self.strings["disabled_name"])
             await self.client(functions.account.UpdateProfileRequest(
                 first_name=self.raw_name.format(time="")
             ))
@@ -210,17 +215,16 @@ class AutoProfileMod(loader.Module):
 
         args = utils.get_args(message)
         if not args:
-            return await utils.answer(message, _("<b>Please specify number of profile pics to remove.</b>"))
+            return await utils.answer(message, self.strings["how_many_pfps"])
         if args[0].lower() == "unlimited":
             pfps_count = None
         else:
             try:
                 pfps_count = int(args[0])
             except ValueError:
-                return await utils.answer(message, _("<b>Wrong amount of pfps.</b>"))
+                return await utils.answer(message, self.strings["invalid_pfp_count"])
             if pfps_count <= 0:
-                return await utils.answer(message, _("<b>Please provide positive number of"
-                                                     + " profile pictures to remove.</b>"))
+                return await utils.answer(message, self.strings["invalid_pfp_count"])
 
         await self.client(functions.photos.DeletePhotosRequest(await self.client.get_profile_photos("me",
                                                                                                     limit=pfps_count)))
@@ -228,4 +232,4 @@ class AutoProfileMod(loader.Module):
         if pfps_count is None:
             pfps_count = _("all")
         await self.allmodules.log("delpfp")
-        await utils.answer(message, _("<b>Removed </b><code>{}</code><b> profile pic(s).</b>".format(str(pfps_count))))
+        await utils.answer(message, self.strings["removed_pfps"].format(str(pfps_count)))
