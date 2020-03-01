@@ -37,7 +37,7 @@ def register(cb):
 class LydiaMod(loader.Module):
     """Talks to a robot instead of a human"""
     def __init__(self):
-        self.config = loader.ModuleConfig("CLIENT_KEY", "", _("The API key for lydia, acquire from @IntellivoidDev"),
+        self.config = loader.ModuleConfig("CLIENT_KEY", None, _("The API key for lydia, acquire from @IntellivoidDev"),
                                           "IGNORE_NO_COMMON", False, _("Boolean to ignore users who have no chats "
                                                                        + "in common with you"))
         self.name = _("Lydia anti-PM")
@@ -46,8 +46,7 @@ class LydiaMod(loader.Module):
 
     async def client_ready(self, client, db):
         self._db = db
-        self._lydia = coffeehouse.API(self.config["CLIENT_KEY"])
-        self._me = await client.get_me()
+        self._lydia = coffeehouse.LydiaAI(self.config["CLIENT_KEY"]) if self.config["CLIENT_KEY"] else None
         # Schedule cleanups
         self._cleanup = asyncio.ensure_future(self.schedule_cleanups())
 
@@ -143,9 +142,11 @@ class LydiaMod(loader.Module):
         return await utils.answer(message, _("<code>Successfully cleaned up lydia sessions.</code>"))
 
     async def watcher(self, message):
-        if self.config["CLIENT_KEY"] == "":
+        if not self.config["CLIENT_KEY"]:
             logger.debug("no key set for lydia, returning")
             return
+        if self._lydia is None:
+            self._lydia = coffeehouse.LydiaAI(self.config["CLIENT_KEY"])
         if (isinstance(message.to_id, types.PeerUser) and not self.get_allowed(message.from_id)) or \
                 (self.is_forced(utils.get_chat_id(message), message.from_id)
                  and not isinstance(message.to_id, types.PeerUser)):
