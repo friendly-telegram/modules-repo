@@ -73,7 +73,7 @@ class AutoProfileMod(loader.Module):
         self.client = client
 
     async def autopfpcmd(self, message):
-        """Rotates your profile picture every n seconds with x degrees, usage:
+        """Rotates your profile picture every 60 seconds with x degrees, usage:
            .autopfp <degrees> <remove previous (last pfp)>
 
            Degrees - 60, -10, etc
